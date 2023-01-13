@@ -1,0 +1,18 @@
+% !TeX spellcheck = de_DE
+
+\chapter{Problemstellung und geplantes Vorgehen}
+Ziel dieser Arbeit ist es, das Projekt \enquote{Erweiterung einer bestehenden Drohne um eine Autonomflugfähigkeit} von Harald Wirth und Dominik Helfenstein, siehe \cite{wirthErweiterungBestehendenDrohne2022}\cite{wirthErweiterungBestehendenDrohne2022a}, aufzuarbeiten und fortzuführen. Dazu steht eine Modelldrohne \enquote{Holybro S500} zur Verfügung. Diese wurde zusätzlich mit einem \gls{rpi} ausgestattet, der eine Kommunikation mit der Drohne ermöglicht und zusätzliche Rechenaufgaben übernehmen kann. Dieser Aufbau wird verwendet, um Objekte in der Flugbahn der Drohne zu erkennen und auszuweichen. Bisher können der im Flug befindlichen Drohne über WLAN GPS-Zielkoordinaten zugespielt werden. Anschließend fliegt sie in Richtung des Ziels und verwendet währenddessen Ultraschall, um Objekte in nächster Umgebung zu detektieren. Die Umsetzung was anschließend passieren soll, ist allerdings noch nicht abgeschlossen. Es herrscht folgender Zustand:
+
+\begin{compactitem}
+	\item In den Tests flog die Drohne in Richtung eines ebenen Hindernisses. Sie hielt in sicherer Entfernung an und wurde automatisch gelandet. Bei weiteren Tests an natürlichen Strukturen (Büsche) konnten diese nicht erkannt werden und die Drohne musste manuell abgefangen werden.
+	\item Für weitere Flüge soll das sog. Magneten-Prinzip zur Anwendung kommen (noch nicht implementiert). Bei diesem wird eine Kursänderung um sich im Weg befindliche Hindernisse durchgeführt. [schänes BILD zum Verständnis] Wird das Ziel erreicht, landet die Drohne an gegebenem Punkt. Für produktive Anwendungszwecke reicht dieses aber nicht aus denn eine Zielführung ist nicht garantiert.
+\end{compactitem}
+
+Um das Projekt erfolgreich abzuschließen, wird eine verbesserte Hinderniserkennung und Routenplanung entwickelt. Dieses Projekt sieht vor, dass die Drohne sowohl statische als auch dynamische Hindernisse erkennt und als Karte dokumentiert. Somit wird Navigation durch unbekanntes Terrain    ermöglicht. Weiterhin soll die Drohne gezielt Markierungen ansteuern können.
+
+Im ersten Teil dieser Arbeit wird das bestehende Projekt tiefgründig analysiert. Grundlegende Konzepte werden aufgegriffen und erweitert. Bestandteil hiervon ist das erfolgreiche Anwenden der Tests und Funktionalität des ersten Projektes. Dazu wird die Software angepasst und auch \enquote{\gls{ros}}, was Vorgesehen war aber nie zum Einsatz kam, verwendet um eine Basis für weitere Entwicklungen zu schaffen.\newline
+Ein weiterer Meilenstein ist es, die Sicherheit für weiteres Vorgehen zu schaffen. Sämtliche Software soll ab diesem Punkt im Simulator getestet werden, um Ausfälle und Schäden zu vermeiden. Auch soll die Software zur Hindernis- und Zielerkennung im Simulator getestet werden.
+
+Der zweite Teil sieht vor, ein Kamerasystem zu installieren, um Hindernisse und Ziele zu erkennen. Dieses kommuniziert mittels \acrshort{ros} mit der Drohne selbst und steuert diese so. Die Software der Drohne dokumentiert eine notwendige grundlegende Vorgehensweise und wird als eine Basis für eigene Entwicklungen benutzt.\newline
+Für die Erkennung von Hindernissen ist ein schneller (echtzeitfähiger), zuverlässiger Algorithmus notwendig. Es sind umfangreiche Tests notwendig.\newline
+Zuletzt wird der Navigationsalgorithmus der Drohne erweitert und angepasst.

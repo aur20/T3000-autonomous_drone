@@ -1,0 +1,65 @@
+% Encoding: UTF-8
+
+%%%
+%
+%Beim Erstellen der Bibtex-Datei wird empfohlen darauf zu achten, dass die DOI aufgeführt wird.
+%
+%%%
+
+@book{WSPA,
+author={Sanjiva Weerawarana and Francisco Curbera and Frank Leymann and Tony Storey and Donald F. Ferguson},
+title={Web Services Platform Architecture : SOAP, WSDL, WS-Policy, WS-Addressing, WS-BPEL, WS-Reliable Messaging, and More},
+year={2005},
+price={$31.49},
+publisher={Prentice Hall PTR},
+isbn={0131488740},
+doi = {10.1.1/jpb001}
+}
+
+
+% !! DO NOT USE `label =   {ASF}` in other Misc entries !!
+
+@Misc{ApacheODE,
+  author = {{The Apache Software Foundation}},
+  title =  {Apache ODE\texttrademark{} -- The Orchestration Director Engine},
+  year =   {2016},
+  label =  {ASF},
+  url =    {http://ode.apache.org}
+}
+
+@Article{RVvdA2016,
+  author =    {H.A. Reijers and I. Vanderfeesten and W.M.P. van der Aalst},
+  title =     {The effectiveness of workflow management systems: A longitudinal study},
+  journal =   {International Journal of Information Management},
+  year =      {2016},
+  volume =    {36},
+  number =    {1},
+  pages =     {126--141},
+  month =     feb,
+  doi =       {10.1016/j.ijinfomgt.2015.08.003},
+  publisher = {Elsevier {BV}}
+}
+
+@Comment{jabref-meta: databaseType:biblatex;}
+
+
+
+@misc{haraldwirthNachfolgerInfoStudienarbeitAutonome2022,
+  title = {Nachfolger-{{Info}}\_{{Studienarbeit}}\_autonome\_{{Drohnen}}},
+  author = {Wirth, Harald and Helfenstein, Dominik},
+  date = {2022-07-14}
+}
+
+@thesis{wirthErweiterungBestehendenDrohne2022,
+  title = {Erweiterung Einer Bestehenden {{Drohne}} Um Eine {{Autonomflugfähigkeit}}},
+  author = {Wirth, Harald and Helfenstein, Dominik},
+  date = {2022-01-23},
+  institution = {{DHBW Stuttgart}}
+}
+
+@thesis{wirthErweiterungBestehendenDrohne2022a,
+  title = {Erweiterung Einer Bestehenden {{Drohne}} Um Eine {{Autonomflugfähigkeit}} (2/2)},
+  author = {Wirth, Harald and Helfenstein, Dominik},
+  date = {2022-06-10},
+  institution = {{DHBW Stuttgart}}
+}
