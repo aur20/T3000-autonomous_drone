@@ -4,18 +4,12 @@
 \renewcommand{\dictumwidth}{0.8\linewidth}
 \dictum[Bundesministerium für Digitales und Verkehr\footnote{\url{https://www.dipul.de/homepage/de/informationen/allgemeines/was-ist-eine-drohne}}]{Ein UAS besteht aus einem unbemannten Luftfahrzeug und dessen Ausrüstung. Die Steuerung kann entweder von einem Menschen oder von einem integrierten oder ausgelagerten Computer durchgeführt werden. Dadurch kann eine Drohne auch ein teil- oder vollautonomes Luftfahrzeug darstellen.}
 }
-\chapter{Grundlagen zum Themenbereich \enquote{autonomer Drohnenflug}}
+\chapter{Grundlagen im Themenbereich autonomer Drohnenflug}
 
-Der englische Fachbegriff für Drohnen lautet \enquote{\gls{uas}}. Er stammt vorrangig aus dem militärischen Bereich. Heutzutage wird vermehrt der Begriff \enquote{\gls{uav}} verwendet, so auch fortwährend in dieser Arbeit. Aus dem Modellbau sind \gls{uav} in Form von fernsteuerbaren Flugzeugen, Helikoptern und Multicoptern bekannt. Drohne wird häufig als Synonym für letztere genutzt. Eine häufige Anwendung spielt dabei der autonome Flug, bei dem Anweisungen vom Bediener kommen, die automatisiert durchgeführt werden. So kann eine Drohne auch zu gewerblichem Einsatz kommen, bspw. in den folgenden Bereichen: Landwirtschaft, Wettervorhersage, Vermessung, Bevölkerungsschutz und Transport.
+Der englische Fachbegriff für Drohnen lautet \enquote{\gls{uas}}. Er stammt vorrangig aus dem militärischen Bereich und beschreibt den Flugkörper selbst und etwaige Zusatzgeräte (Waffen). Heutzutage wird vermehrt der Begriff \enquote{\gls{uav}} verwendet, so auch fortwährend in dieser Arbeit. Aus dem Modellbau sind \gls{uav} in Form von fernsteuerbaren Flugzeugen, Helikoptern und Multicoptern bekannt. Drohne wird häufig als Synonym für letztere genutzt. Eine häufige Anwendung spielt dabei der autonome Flug, bei dem Anweisungen vom Bediener kommen, die automatisiert durchgeführt werden. So kann eine Drohne auch zu gewerblichem Einsatz kommen, bspw. in den folgenden Bereichen: Landwirtschaft, Wettervorhersage, Vermessung, Bevölkerungsschutz und Transport.
 
 Zur Einstufung des automatisierten Verhaltens von Drohnen definiert die European Cockpit Association AISBL 6 \enquote{Level} (Klassen), veranschaulicht in Grafik \ref{fig:automation_levels}.
 Verfügbare \gls{uav} implementieren bereits automatische Funktionen der unteren Level, wie bspw. Regelung zur Flugstabilität und dem Halten einer Flugrichtung. Interessant sind die oberen Level, beginnend bei Level 3:
-
-\begin{figure}[!h]
-	\includegraphics[width=\linewidth]{images/drone_autonomy_levels.png}
-	\caption{Einteilung Automation von \gls{uav}: Vom niedrigsten Level (0) zum höchsten Level (5) steigt der Automationsgrad (\url{https://blog.cloudfactory.com/levels-of-drone-autonomy}).}
-	\label{fig:automation_levels}
-	\end{figure}
 
 \begin{compactenum}[{Level} 1]
     \setcounter{enumi}{2}
@@ -24,40 +18,29 @@ Verfügbare \gls{uav} implementieren bereits automatische Funktionen der unteren
 	\item - Vollständige Automation (Autonomie): Eigenständige Flugplanung von Start über Flugstrecke bis Landung. Mit derzeitigen Mitteln nicht realisierbar\footnote{siehe https://twitter.com/elonmusk/status/1411280212470366213}.
 \end{compactenum}
 
-Das \gls{lba} erlässt zudem Regelungen, wonach ein autonomer Flug \enquote*{[...] derzeit nicht zulässig [ist]; Fernpiloten müssen jederzeit eingreifen können. [...]}\footnote{\url{https://lba-openuav.de/onlinekurs/lehrmaterial/allgemeine-uas-kunde/kontrolle-und-flugmodi/}}.  
+\begin{figure}[!h]
+	\includegraphics[width=\linewidth]{images/drone_autonomy_levels.png}
+	\caption{Einteilung Automation von \gls{uav}: Vom niedrigsten Level (0) zum höchsten Level (5) steigt der Automationsgrad, von \cite{cloudfactoryBreakingLevelsDrone}).}
+	\label{fig:automation_levels}
+	\end{figure}
+
+Das \gls{lba} erlässt zudem Regelungen, wonach ein autonomer Flug \enquote*{[...] derzeit nicht zulässig [ist]; Fernpiloten müssen jederzeit eingreifen können. [...]}\cite{openuavadminDatenverbindungUndFlugmodi}.  
 
 Der bisherige Stand des Projektes steht im Übergang von Automationsklasse 3 auf Klasse 4. Allerdings fehlen generalisierte Anwendungsfälle (später gezeigt) sodass die Drohne noch nicht wie gewünscht, Hindernissen ausweicht (das bisherige Verhalten beschränkt sich auf sicheres Landen beim Erkennen von Hindernissen).
 
-\section{Die Drohne und ihr Umfeld}
-Aus der Ausarbeitung erschloss sich, dass nur ein Drohnen-Bausatz zur Umsetzung des Projektes genutzt werden kann. Ein Bausatz kann flexibel mit zusätzlichen Sensoren und Bordcomputer erweitert und programmiert werden. Der bereitgestellte Aufbau wird vereinfacht in Bild \ref{fig:setup_initial} dargestellt. Die wichtigsten Bestandteile sind:
-\begin{compactdesc}
-	\item[Flugcontroller:] Kontrolle der originalen Drohne
-	\item[\gls{rpi}:] Bereitstellen von WLAN-Netzwerk und Verbindung mit Flugcontroller
-	\item[Ultraschallsensoren:] Erfassen von Hindernissen in der Umgebung
-	\item[Bodenstation:] Laptop/Smartphone der Flug steuert und Drohne parametriert; zum Einsatz kommt die Software QGroundControl, siehe \cite[Kapitel 4.3.5]{wirthErweiterungBestehendenDrohne2022}
-\end{compactdesc}
 
-\begin{figure}[!h]
-	\includegraphics[width=\linewidth]{images/setup_initial_simple.drawio.png}
-	\caption{Gesamtbild Zusammenwirken der Bauteile der Drohne}
-	\label{fig:setup_initial}
-	\end{figure}
-
-Zur Entwicklung wurde das Modell Holybro S500 ausgewählt, welches in dieser Arbeit weiterhin verwendet wird. Der Quadcopter hat folgende Eigenschaften:
-\begin{compactitem}
-	\item Gewicht: 935g, Gesamtgewicht mit Akku, Sensoren und Bordcomputer: ?
-	\item Traglast: 1,8kg
-	\item Akku: Typ - LiPo; Nennspannung - 14,8V; Kapazität - 5000mAh; Capacity-Racting: 10C; Gewicht - ?
-	\item Flugcontroller: \gls{px4}
-	\item Sensoren: Gyroskop, Beschleunigung, Kompass, Barometer, \acrshort{gps}, Ultraschall
-\end{compactitem}
-
-Um den autonomen Flug planen zu können, wären mögliche Fluggeschwindigkeit und Flugdauer notwendig. Dazu ist keine Angabe vom vorhergehenden Projekt bekannt, die Werte werden in diesem Projekt ermittelt.
-
+%
+%\begin{figure}[!h]
+%	\includegraphics[width=\linewidth]{images/setup_initial_simple.drawio.png}
+%	\caption{Gesamtbild Zusammenwirken der Bauteile der Drohne}
+%	\label{fig:setup_initial}
+%	\end{figure}
+%
+%
 %Die Verwendung von \gls{ros} \cite[Kapitel 3.6.1]{wirthErweiterungBestehendenDrohne2022} als treibende Software zur Automatisierung ist bisher weder ausreichend entwickelt noch empfohlen \cite{haraldwirthNachfolgerInfoStudienarbeitAutonome2022}, aber doch notwendig für eine erfolgreiche Umsetzung des Projektes \cite[Kapitel 9.1]{wirthErweiterungBestehendenDrohne2022a}.
 %Außerdem soll zur Automatisierung auf dem \gls{rpi} das Framework \gls{ros} verwendet werden, wie in \cref{chap:ros} zum Einsatz.
 
-Um die Modelldrohne Holybro S500 Fliegen zu dürfen, bestehen in Deutschland mehrere Vorraussetzungen\footnote{\url{https://lba-openuav.de/onlinekurs/lehrmaterial}}:
+Wie in \cref{chap:sota} erläutert, wird die Modelldrohne Holybro S500 verwendet. Um diese Fliegen zu dürfen, bestehen in Deutschland mehrere Vorraussetzungen\footnote{\url{https://lba-openuav.de/onlinekurs/lehrmaterial}}:
 \begin{compactitem}
 	\item Drohnenführerschein: Unterkategorie A2 (\gls{uas} bis $4kg$, $5m$ Abstand zu Menschen, kein Überfliegen von Menschenansammlungen, nur auf Sichtweite fliegen)
 	\item Höhenmesser: die maximale Flughöhe von $120m$ darf nicht überschritten werden
@@ -71,15 +54,9 @@ Somit der Einsatz der Drohne im öffentlichen Raum streng untersagt. Tests besch
 \section{Peripherie an der Drohne}
 Im Flugcontroller integriert sind mehrere Sensoren (Beschleunigung, Gyroskop, Magnetometer, Barometer). Neben diesen besitzt das Modell einen dedizierten \gls{gps}-Empfänger. Nachfolgend ist dargestellt, wie diese Sensoren ausgewertet werden können.
 
-\subsection{Kommunikation mit dem Flugcontroller}\label{chap:drone_coms}
-Der Flugcontroller kann als eigenständige Einheit betrieben werden. Dabei kann die Drohne mittels Fernsteuerung gesteuert werden. In diesem manuellen Betrieb ist die Drohne nicht programmierbar.\newline
-Für zusätliche Funktionen stellt der Flugcontroller einen USB-Port und mehrere Telemetry-Ports bereit. Alle Daten zu und vom Flugcontroller werden mit dem \gls{mav}\footnote{\url{https://mavlink.io/en/}}-Protokoll übertragen. Die Daten können von Bodenstation oder entsprechenden Anwendungen ausgewertet werden. Mit der USB-Verbindung kann eine direkte Verbindung zu einem PC hergestellt werden. Somit lässt sich die Drohne einrichten, allerdings muss die Kabelverbindung zum Flug getrennt werden. Auch wird zur allgemeinen Flugsteuerung davon abgeraten die USB-Schnittstelle zu verwenden, da es bei der Datenübertragung zu Verzögerungen kommen kann.\newline
-Der auf die Drohne montierte \gls{rpi} kommuniziert mit dem Flugcontroller über den Telemetry-Port. Hierbei wird eine UART-Verbindung (bidirektionale Kommunikation über je eine Signalleitung) verwendet, da diese im Gegensatz zu USB einfacher zu programmieren ist und verzögerungsfrei arbeitet.\newline
-Das \gls{mav}-Protokoll zeichnet sich durch eine allgemein hohe Effizienz (geringer Overhead) aus. Nachrichten werden nach Themengebieten (z.B. Nachrichten vom Typ \textit{HIGHRES\_IMU} liefern Sensordaten) geordnet. Somit lässt sich eine bestimmte Eigenschaft von Interesse auslesen bzw. einspeisen. Um verlässliche Resultate beim Übertragen der Daten zu erhalten, enthalten so gut wie alle Nachrichten den Zeitpunkt des Absendens.\newline
-Der Flugcontroller kann konfiguriert werden nur Nachrichten bestimmter Typen zu versenden, um die Rechenlast zu verringern und höhere Übertragungsraten zu erlauben. Zu den möglichen Einstellungen zählen bspw. \textit{Normal} (Verbindung zu Bodenstation) oder \textit{Onboard} (Verbinfung zu mitgeführtem Computer) wobei ca. 40 respektive 50 Nachrichtentypen versendet werden. Wird die Einstellung \textit{Normal} verwendet, so werden keine Nachrichten vom Typ \textit{HIGHRES\_IMU} versendet. Außerdem wird für jeden Nachrichtentyp die Frequenz festgelegt, sie beträgt bspw. für die \textit{HIGHRES\_IMU} $50Hz$. 
+%\subsection{Kommunikation mit dem Flugcontroller}\label{chap:drone_coms} Der Flugcontroller kann als eigenständige Einheit betrieben werden. Dabei kann die Drohne mittels Fernsteuerung gesteuert werden. In diesem manuellen Betrieb ist die Drohne nicht programmierbar.\newline Für zusätliche Funktionen stellt der Flugcontroller einen USB-Port und mehrere Telemetry-Ports bereit. Alle Daten zu und vom Flugcontroller werden mit dem \gls{mav}\footnote{\url{https://mavlink.io/en/}}-Protokoll übertragen. Die Daten können von Bodenstation oder entsprechenden Anwendungen ausgewertet werden. Mit der USB-Verbindung kann eine direkte Verbindung zu einem PC hergestellt werden. Somit lässt sich die Drohne einrichten, allerdings muss die Kabelverbindung zum Flug getrennt werden. Auch wird zur allgemeinen Flugsteuerung davon abgeraten die USB-Schnittstelle zu verwenden, da es bei der Datenübertragung zu Verzögerungen kommen kann.\newline Der auf die Drohne montierte \gls{rpi} kommuniziert mit dem Flugcontroller über den Telemetry-Port. Hierbei wird eine UART-Verbindung (bidirektionale Kommunikation über je eine Signalleitung) verwendet, da diese im Gegensatz zu USB einfacher zu programmieren ist und verzögerungsfrei arbeitet.\newline Das \gls{mav}-Protokoll zeichnet sich durch eine allgemein hohe Effizienz (geringer Overhead) aus. Nachrichten werden nach Themengebieten (z.B. Nachrichten vom Typ \textit{HIGHRES\_IMU} liefern Sensordaten) geordnet. Somit lässt sich eine bestimmte Eigenschaft von Interesse auslesen bzw. einspeisen. Um verlässliche Resultate beim Übertragen der Daten zu erhalten, enthalten so gut wie alle Nachrichten den Zeitpunkt des Absendens.\newline Der Flugcontroller kann konfiguriert werden nur Nachrichten bestimmter Typen zu versenden, um die Rechenlast zu verringern und höhere Übertragungsraten zu erlauben. Zu den möglichen Einstellungen zählen bspw. \textit{Normal} (Verbindung zu Bodenstation) oder \textit{Onboard} (Verbinfung zu mitgeführtem Computer) wobei ca. 40 respektive 50 Nachrichtentypen versendet werden. Wird die Einstellung \textit{Normal} verwendet, so werden keine Nachrichten vom Typ \textit{HIGHRES\_IMU} versendet. Außerdem wird für jeden Nachrichtentyp die Frequenz festgelegt, sie beträgt bspw. für die \textit{HIGHRES\_IMU} $50Hz$. 
 
-\subsection{Sensoren des Flugcontrollers}
-Ausgelesen vom Flugcontroller werden die Sensoren der \textit{HIGHRES\_IMU}. Dabei werden Messpunkte mit hoher Frequenz und Auflösung bereitgestellt. Eine Verarbeitung muss die Daten filtern um weitere Berechnungen durchführen zu können. Zur Verwendung kommt \gls{ros}, 
+%\subsection{Sensoren des Flugcontrollers} Ausgelesen vom Flugcontroller werden die Sensoren der \textit{HIGHRES\_IMU}. Dabei werden Messpunkte mit hoher Frequenz und Auflösung bereitgestellt. Eine Verarbeitung muss die Daten filtern um weitere Berechnungen durchführen zu können. Zur Verwendung kommt \gls{ros}, 
 
 \subsection{Navigation mittels GPS}
 Die Navigation der Drohne erfolgt vorrangig über \gls{gps}. Mit solchem System können die aktuelle Position und Geschwindigkeit festgestellt werden. Für ein reales System muss ein eventueller Ausfall der \gls{gps}-basiertern Navigation in Betracht gezogen werden, denn \gls{gps} setzt klare Sicht zum Himmel und eine Verbindung zu mindestens 4 Satelliten voraus. [Quelle]
@@ -108,7 +85,7 @@ Ein weiteres Problem ist die totale Abhängigkeit von \gls{gps} in Bezug auf Zie
 %Eine gezielte Umgehung von Hindernissen sollte allerdings Teil des autonomen Fluges sein.
 %
 
-\subsection{Hinderniserkennung durch Ultraschallsensoren}
+\subsection{Hinderniserkennung durch Ultraschallsensoren}\label{chap:ultrasonic}
 Mit einem Ultraschallsensor kann der Abstand zu Objekten gemessen werden. 
 
 Das Prinzip der Ultraschallortung besteht aus 3 Schritten:
@@ -125,9 +102,9 @@ Die Formel zur Bestimmtung der Entfernung eines Objektes lautet ist gegeben in F
 	&=\frac{1}{2}c_{20}(1+\alpha_{20}(\vartheta-20))	\label{mat:dist_by_t}
 \end{align}
 
-\section{Bilderkennung und \enquote{Obstacle Avoidance}}
+\section{Bilderkennung und Obstacle Avoidance}
 Mannigfaltige Prinzipien fallen in den Bereich der Bilderkennung. Der Fokus dieses Projektes, das Erkennen und Ausweichen von Hindernissen wird \enquote{Obstacle Avoidance} genannt. Es ist nicht zu verwechseln mit \enquote{Obstacle Detection}, dem Erkennen und Klassifizieren von Bildinhalten. Nachfolgend vorgestellt werden Techniken die hier zum Einsatz kommen könnten. 
-\paragraph*{SLAM Algorithmus}
+\paragraph*{SLAM Algorithmus}\label{chap:slam}
 \Gls{slam} Techniken entstanden bereits in den 1980-1990 Jahren und wird bspw. bei Robotern eingesetzt, die in Hallen navigieren (kein \gls{gps} verfügbar). Dazu kommen mit Kamerasysteme in Verbindung mit Entfernungssensor (Sonar, Radar, Lidar) zur Verwendung . Die Ergebnisse von \gls{slam} können nicht garantiert werden und sind nicht reproduzierbar, weshalb es in keinen kritischen Umgebungen (bspw. wenn Verletzungsrisiko besteht) eingesetzt werden kann.
 
 Allgemein wird \gls{slam} durch einen modularen Prozess beschrieben: \begin{compactdesc}
@@ -145,8 +122,12 @@ Allgemein wird \gls{slam} durch einen modularen Prozess beschrieben: \begin{comp
 %was sollte hier noch hin
 
 \paragraph*{Visual SLAM} 
-Eine Sonderform des \gls{slam} ist Visual gls{slam} (vSLAM). Bei diesem werden ausschließlich Kameras zur Erkennung der Umgebung eingesetzt. Der Algorithmus verwendet zusätzliche Sensordaten um die Bewegung der Kamera in die Berechnung der Position einzubeziehen.
+Eine Sonderform des \gls{slam} ist Visual \gls{slam} (vSLAM). Bei diesem werden ausschließlich Kameras zur Erkennung der Umgebung eingesetzt. Der Algorithmus verwendet zusätzliche Sensordaten um die Bewegung der Kamera in die Berechnung der Position einzubeziehen.
 
-\paragraph*{Stereokamera}
-Verwendet mehrere Kameras aus parallelverschobenen Bildern Tiefeninformationen zu gewinnen., also Abstand zu Punkten im Bild zu erkennen.
+\paragraph*{Stereokamera}\label{chap:stereovision}
+Verwendet mehrere Kameras aus parallelverschobenen Bildern Tiefeninformationen zu gewinnen. also Abstand zu Punkten im Bild zu erkennen.
 \paragraph*{Optical Flow}
+Auswertung der Bewegung von Objekten in Videoabläufen. Kann schlecht zwischen Bewegung der Kamera und Bewegung der Objekte unterscheiden. Ungenau, da Kameras immer eine Verzerrung besitzen. 
+
+\section{Robot Operating System}
+koennte auch mal noch... ist erklaert in \cite[Kapitel 2.2]{wirthErweiterungBestehendenDrohne2022a}

@@ -1,7 +1,7 @@
 % !TeX spellcheck = de_DE
 In diesem Kapitel wird das bestehende Projekt aus nachvollzogen und überarbeitet. Inhalte sind das Testen bestehender Vorlagen aus \cite{wirthErweiterungBestehendenDrohne2022} und \cite{wirthErweiterungBestehendenDrohne2022a}, sowie das Aufsetzen einer neuen Arbeitsumgebung wie in beschrieben in \cite{haraldwirthNachfolgerInfoStudienarbeitAutonome2022}, siehe \cref{chap:nachfolger}.
 
-\section{Inbetriebnahme}
+\section{Inbetriebnahme}\label{chap:einarbeite}
 Zur Aufarbeitung des Projektes steht ist die Drohne bestehend aus Rahmen, Flugcontroller, Motoren mit Propellern, Ultraschallsensoren und Akku bereit. Nicht vorhanden sind die RC-Fernsteuerung und der auf die Drohne montierte \gls{rpi}. Ursprünglich verwedet wurde ein \gls{rpi} 4 Model B mit $2GB$ \gls{ram} als Bordcomputer, der mit dem Flugcontroller kommuniziert, dessen Daten über ein Netzwerk verbreitet und auch Anweisungen zum Flug geben kann. Gleiches kann auch mit dem \gls{rpi} 3 Model B+ bewerkstelligt werden. Dieser bestitzt im Gegensatz nur 1GB \gls{ram} und weniger Rechenleistung.
 Die gelieferte SD-Karte enthält das Betriebssystem Raspbian OS in der Ausführung als 32-bit Betriebssystem. Sowohl \gls{rpi} Model 4 als auch Model 3 besitzen zwar 64-bit Prozessoren, allerdings wird bei bis zu 4GB \gls{ram} das 32-bit Betriebssystem empfohlen um diesen effektiver auszunutzen.
 Der verwendete \gls{rpi} startet somit problemlos.
@@ -120,7 +120,7 @@ Um die Genauigkeit des GPS zu verbessern gibt es verschiedene Möglichkeiten\foo
 Der Flugcontroller stellt verschiedene Sensoren bereit. Zusätzlich waren im ersten Projekt Ultraschallsensoren an den \gls{rpi} angeschlossenen. 
 
 \subsubsection{Ultraschallsensoren am RPI}
-Zuerst sollen die Ultraschall-Sensoren mit dem \gls{rpi} verbunden und getestet werden, um die Wiederverwendbarkeit zu bewerten. Derzeit sind an der Drohne 4 Ultraschallsensoren verbaut. Davon sind zwei nach vorn gerichtet, und jeweils einer nach oben und unten. Somit könnnen Objekte in der Flugbahn detektiert werden, solange die Bewegung entlang einer der Raumrichtungen: \enquote{Oben},\enquote{Unten} oder \enquote{Vorwärts} stattfindet. Zusammengesetzte Bewegungen dürften nicht durchgeführt werden, auch darf sich die Drohne nicht rückwärts bewegen.
+Zuerst sollen die Ultraschall-Sensoren mit dem \gls{rpi} verbunden und getestet werden, um die Wiederverwendbarkeit zu bewerten. %Derzeit sind an der Drohne 4 Ultraschallsensoren verbaut. Davon sind zwei nach vorn gerichtet, und jeweils einer nach oben und unten. 
 
 In \cite[Kapitel 4.3.9]{wirthErweiterungBestehendenDrohne2022} ist beschrieben dass die Signale der Sensoren mit $5V$ anliegen, aber auf $3,3V$ herabgesetzt werden müssen um die Pins des \gls{rpi} nicht zu beschädigen.
 Die Beschreibung sieht vor dazu einen Spannungsteiler einzusetzen. Bei genauem betrachten des Schaltplans fällt auf, dass der Spannungsteiler falsch gebaut wurde, und nicht die gewünschte Funktion erfüllt. Um die Pins des \gls{rpi} nicht doch zu beschädigen muss eine alternative Lösung gefunden werden. 

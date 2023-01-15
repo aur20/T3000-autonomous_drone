@@ -156,6 +156,7 @@
 
 %%%
 % Grafikeinbindungen
+\usepackage{subcaption}
 \usepackage{graphicx}%Parameter "pdftex" unnoetig
 \graphicspath{{\getgraphicspath}}
 \newcommand{\getgraphicspath}{graphics/}
@@ -344,7 +345,7 @@ inkscape -z -D --file=\getgraphicspath#1.svg %
 % Bug #24: http://sourceforge.net/p/latex-caption/tickets/24/
 % corrected caption3.sty: http://sourceforge.net/p/latex-caption/code/HEAD/tree/branches/3.3/tex/caption3.sty
 %
-\usepackage[caption=false, lofdepth=1, lotdepth, margin=5pt]{subfig}
+%\usepackage[caption=false, lofdepth=1, lotdepth, margin=5pt]{subfig}
 %
 %%%
 
@@ -456,9 +457,9 @@ inkscape -z -D --file=\getgraphicspath#1.svg %
 	natbib        = true,
 	eprint        = true,
 	url           = true,
-  doi           = true,
+  doi           = false,
   isbn          = true,
-  backref       = true]{biblatex}
+  backref       = false]{biblatex}
 \bibliography{bibliography}
 %\addbibresource[datatype=bibtex]{bibliography.bib}
 
