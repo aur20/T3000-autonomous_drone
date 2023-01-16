@@ -23,9 +23,9 @@
 
 #define cm_per_usecond 0.03435  // v=s/t <-> t=s/v
 #define alpha20 1.75e-3
-#define t_echo_min (2 / cm_per_usecond)
-#define t_echo_max (380 / cm_per_usecond)
-#define t_echo_outofrange (400 / cm_per_usecond)
+#define t_echo_min (2 * 2 / cm_per_usecond)
+#define t_echo_max (2 * 380 / cm_per_usecond)
+#define t_echo_outofrange (2 * 400 / cm_per_usecond)
 float temp = 20;  // temperature to be received from I2C
 unsigned long measure_distance(uint8_t triggerPin, uint8_t echoPin){
   // generate 10-microsecond pulse to TRIG pin
@@ -85,7 +85,7 @@ float filter_moving_average (unsigned short _i, unsigned long t){
   arr[*index] = t;
   *index = (*index + 1) % filter_array_size;
 
-  return ((float)((*mean) >> filter_array_shift)) * cm_per_usecond;
+  return ((float)((*mean) >> (filter_array_shift + 1)) * cm_per_usecond;
 }*/
 
 /* alternative method, not that good
@@ -113,7 +113,7 @@ float filter_median2(unsigned short _i, unsigned long t){
   else { // return this value
 	arr[*index] = t;
   }
-  return (float(t)) * cm_per_usecond;
+  return 0.5 * (float(t)) * cm_per_usecond;
 }*/
 
 /* I2C Definitions

@@ -12,12 +12,15 @@ import struct
 addr = 0x8 # bus address of target device
 bus = SMBus(1) # indicates /dev/ic2-1
 
-print ("Enter 1..4 or a to get corresponding sensor")
+print ("Enter '1..4' or 'a' to get corresponding sensor. 't' to set temperature. 'r' to get raw unfiltered data. Anything else to exit.")
 while True:
 	action = input(">>>>   ")
 	if action == "a":
 		c = 0
 		req = bus.read_i2c_block_data(addr, ord('a'), 16) # get all sensors
+	elif action == "r":
+		c = 5
+		req = bus.read_i2c_block_data(addr, ord('r'), 16) # get all sensors raw data
 	elif action == "t":
 		temp = input("Enter a value for environmental temperature:")
 		data = bytearray(struct.pack("f", float(temp)))
@@ -39,7 +42,11 @@ while True:
 		break
 
 	#print("Length of received data: %s Type: %s Data: %s" % (len(req), type(req), req))
-	r = struct.iter_unpack('<f', bytearray(req))
+	if c == 5:
+		r = struct.iter_unpack('<L', bytearray(req))
+		c = 0
+	else:
+		r = struct.iter_unpack('<f', bytearray(req))
 
 	for i in r:
 		c = c + 1;
