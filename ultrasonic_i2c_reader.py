@@ -9,10 +9,8 @@
 from smbus2 import SMBus
 import struct
 
-addr = 0x8 # bus address
+addr = 0x8 # bus address of target device
 bus = SMBus(1) # indicates /dev/ic2-1
-
-numb = 1
 
 print ("Enter 1..4 or a to get corresponding sensor")
 while True:
@@ -20,6 +18,11 @@ while True:
 	if action == "a":
 		c = 0
 		req = bus.read_i2c_block_data(addr, ord('a'), 16) # get all sensors
+	elif action == "t":
+		temp = input("Enter a value for environmental temperature:")
+		data = bytearray(struct.pack("f", float(temp)))
+		req = bus.write_i2c_block_data(addr, ord('t'), data) # get first sensor
+		continue
 	elif action == "1":
 		c = 0
 		req = bus.read_i2c_block_data(addr, 1, 4) # get first sensor
@@ -32,7 +35,6 @@ while True:
 	elif action == "4":
 		c = 3
 		req = bus.read_i2c_block_data(addr, 4, 4) # get fourth sensor
-
 	else:
 		break
 
