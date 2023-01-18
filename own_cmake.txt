@@ -1,0 +1,4 @@
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+add_executable(offboard_control src/offb_node.cpp)
+target_link_libraries(offboard_control ${catkin_LIBRARIES})

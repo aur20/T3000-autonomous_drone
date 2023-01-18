@@ -1,27 +1,32 @@
 version: "3.9"
 services:
   core:
-    build: ./roscore
+    build: 
+      dockerfile: Dockerfile
     network_mode: host
+    command: roscore
   mavros:
-    build: ./mavros
+    build: 
+      dockerfile: Dockerfile
     network_mode: host
-    command: roslaunch --wait mavros px4.launch fcu_url:=tcp://${RPI_IP}:5760
-    #udp://:14560@${RPI_IP}:14560
     depends_on:
       - core
+    command: roslaunch --wait mavros px4.launch fcu_url:=$RPI_CONNECT
   graph:
-    build: ./graph
+    build: 
+      dockerfile: Dockerfile
     network_mode: host
+    environment:
+      - LIBGL_ALWAYS_INDIRECT=$LIBGL_ALWAYS_INDIRECT
+      - DISPLAY=$DISPLAY
     depends_on:
       - core
-  app:
-    build: ./app
+    command: rqt
+  offboard_control:
+    build: 
+      dockerfile: Dockerfile
     network_mode: host
     depends_on:
       - core
       - mavros
-
-# run QGC
-# https://github.com/PX4/PX4-Autopilot/issues/18389
-
+    command: /bin/bash -c 'source ~/catkin_ws/devel/setup.bash && roslaunch --wait app app.launch'

@@ -1,0 +1,6 @@
+<launch>
+    <node name="offboard_control" pkg="app" type="offboard_control" output="screen" />
+<!-- If you want to use python, you must install first via apt
+    <node name="offb_node_py" pkg="offboard_py" type="offb_node.py" required="true" output="screen" /> 
+-->
+</launch>
