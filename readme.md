@@ -1,5 +1,8 @@
-# Main branch
+# Example branch using ROS
 
-You might want to go to:
- * [Documentation](https://github.com/aur20/T3000-autonomous_drone/tree/Dokumentation)
- * [Ultrasonic reader](https://github.com/aur20/T3000-autonomous_drone/tree/arduino_sensors)
+Steps to reproduce:
+ * Set drone to HIL-mode
+ * Download any AirSim, connect to drone
+ * Start QGroundControl
+ * Start docker
+ * Anything might happen but the drone shall fly

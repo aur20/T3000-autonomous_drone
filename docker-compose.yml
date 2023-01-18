@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  core:
+    build: ./roscore
+    network_mode: host
+  mavros:
+    build: ./mavros
+    network_mode: host
+    command: roslaunch --wait mavros px4.launch fcu_url:=tcp://${RPI_IP}:5760
+    #udp://:14560@${RPI_IP}:14560
+    depends_on:
+      - core
+  graph:
+    build: ./graph
+    network_mode: host
+    depends_on:
+      - core
+  app:
+    build: ./app
+    network_mode: host
+    depends_on:
+      - core
+      - mavros
+
+# run QGC
+# https://github.com/PX4/PX4-Autopilot/issues/18389
+

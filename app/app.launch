@@ -1,0 +1,4 @@
+<launch>
+    <node name="commander1" pkg="app" type="offb_node" output="screen" />
+<!--    <node name="offb_node_py" pkg="offboard_py" type="offb_node.py" required="true" output="screen" /> -->
+</launch>
