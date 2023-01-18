@@ -1,25 +1,25 @@
 % !TeX spellcheck = de_DE
+\chapter{Aufarbeitung bestehendes Drohnenprojekt}\label{chap:main}
 In diesem Kapitel wird das bestehende Projekt aus nachvollzogen und überarbeitet. Inhalte sind das Testen bestehender Vorlagen aus \cite{wirthErweiterungBestehendenDrohne2022} und \cite{wirthErweiterungBestehendenDrohne2022a}, sowie das Aufsetzen einer neuen Arbeitsumgebung wie in beschrieben in \cite{haraldwirthNachfolgerInfoStudienarbeitAutonome2022}, siehe \cref{chap:nachfolger}.
 
 \section{Inbetriebnahme}\label{chap:einarbeite}
-Zur Aufarbeitung des Projektes steht ist die Drohne bestehend aus Rahmen, Flugcontroller, Motoren mit Propellern, Ultraschallsensoren und Akku bereit. Nicht vorhanden sind die RC-Fernsteuerung und der auf die Drohne montierte \gls{rpi}. Ursprünglich verwedet wurde ein \gls{rpi} 4 Model B mit $2GB$ \gls{ram} als Bordcomputer, der mit dem Flugcontroller kommuniziert, dessen Daten über ein Netzwerk verbreitet und auch Anweisungen zum Flug geben kann. Gleiches kann auch mit dem \gls{rpi} 3 Model B+ bewerkstelligt werden. Dieser bestitzt im Gegensatz nur 1GB \gls{ram} und weniger Rechenleistung.
+Zur Aufarbeitung des Projektes steht ist die Drohne bestehend aus Rahmen, Flugcontroller, Motoren mit Propellern, Ultraschallsensoren und Akku bereit. Nicht vorhanden sind die RC-Fernsteuerung und der auf die Drohne montierte \gls{rpi}. Ursprünglich als Bordcomputer verwendet wurde ein \gls{rpi} 4 Model B mit $2GB$ \gls{ram}. Gleiches kann auch mit dem \gls{rpi} 3 Model B+ bewerkstelligt werden. Dieser bestitzt im Gegensatz nur 1GB \gls{ram} und unbedeutend weniger Rechenleistung.
 Die gelieferte SD-Karte enthält das Betriebssystem Raspbian OS in der Ausführung als 32-bit Betriebssystem. Sowohl \gls{rpi} Model 4 als auch Model 3 besitzen zwar 64-bit Prozessoren, allerdings wird bei bis zu 4GB \gls{ram} das 32-bit Betriebssystem empfohlen um diesen effektiver auszunutzen.
 Der verwendete \gls{rpi} startet somit problemlos.
 Beim Systemstart wird automatisch der WLAN-Hotspot aktiviert und der MAVLINK-Server (mavlink-routerd) gestartet. %und verschiedene Docker Container
 %Auf dem \gls{rpi} 3 führt dies führt zu einer hohen Systemauslastung, 1 von 4 CPU-Kernen ist permanent zu 100% belegt. Auch die Temperatur erhöht wodurch sich die Kerntemperatur auf ca 53°C erhöht. --- anscheinend doch nicht
 
 \subsubsection{Verbindung Flugcontroller mit \gls{rpi}}
-Durch das automatische Setup des \gls{rpi} sollte die Drohne mit dem Einstecken des Stromes bereit zum Flug sein. In \cite[Kapitel 4.3.6]{wirthErweiterungBestehendenDrohne2022} ist der erste Schritt beschrieben als "Test der Verbindung". Der \gls{rpi} wird mit dem Flugcontroller  per Serieller Schnittstelle verbunden (siehe auch \cref{chap:drone_coms}). Dazu wurde eigens ein Kabel entwickelt, welches die UART-Pins des \gls{rpi} mit dem TELEM2-Port des Flugcontrollers verbindet. Es ist zu beachten, dass keine Dokumentation bezüglich der Belegung der Kabeladern (per Jumper an den \gls{rpi} zu Stecken) gegeben ist. Ein Ausmessen des Kabels ergab:
+Durch das automatische Setup des \gls{rpi} sollte die Drohne mit dem Einstecken des Stromes bereit zum Flug sein. In \cite[Kapitel 4.3.6]{wirthErweiterungBestehendenDrohne2022} ist der erste Schritt beschrieben als "Test der Verbindung". Der \gls{rpi} wird mit dem Flugcontroller per Serieller Schnittstelle verbunden%(siehe auch \cref{chap:drone_coms})
+. Dazu wurde eigens ein Kabel entwickelt, welches die UART-Pins des \gls{rpi} mit dem TELEM2-Port des Flugcontrollers verbindet. Es ist zu beachten, dass keine Dokumentation bezüglich der Belegung der Kabeladern (per Jumper an den \gls{rpi} zu Stecken) gegeben ist. Ein Ausmessen des Kabels ergab:
 \begin{compactitem}
     \item Schwarz: Masse -> Pin 06 des \gls{rpi}
     \item Braun: UART-Receive (Rx) des Flugcontrollers -> Pin 08 (Tx) des \gls{rpi}
     \item Weiß: UART-Transmit (Tx) des Flugcontrollers -> Pin 10 (Rx) des \gls{rpi}
 \end{compactitem}
-Anschließend soll die Verbindung wie in \cite[Kapitel 4.3.6]{wirthErweiterungBestehendenDrohne2022} beschrieben, die MAVLINK-Konsole geöffnet werden. Jedoch ist das Programm \textit{mavproxy} auf dem aktuellen Image nicht vorhanden. Um das weitere Vorgehen zu konkretisieren wurde das Programm nachinstalliert\footnote{\url{https://ardupilot.org/mavproxy/docs/getting_started/download_and_installation.html\#mavproxy-downloadinstalllinux}}. Das Starten des Konsolenprogrammes ist nur möglich, wenn der MAVLINK-Server (Prozess \textit{mavlink-routerd}) nicht läuft (ansonsten ist die Serielle Schnittstelle blockiert). Mit dem Befehl: 
-\texttt{mavproxy.py -{}-master=/dev/serial0 -{}-baudrate=921600}
-kann schließlich die Kommunikation des \gls{rpi} mit der Drohne verifiziert werden.
+Anschließend soll die Verbindung wie in \cite[Kapitel 4.3.6]{wirthErweiterungBestehendenDrohne2022} beschrieben, die MAVLINK-Konsole geöffnet werden. Jedoch ist das Programm \enquote{mavproxy} auf dem aktuellen Image nicht vorhanden. Um das weitere Vorgehen zu vereinfachen wurde das Programm nachinstalliert\footnote{\url{https://ardupilot.org/mavproxy/docs/getting_started/download_and_installation.html}\cite{ardupilotdevteamGettingStartedMAVProxy}}. Das Starten des Konsolenprogrammes ist nur möglich, wenn der \gls{mav}-Server (Prozess \textit{mavlink-routerd}) nicht läuft (ansonsten ist die Serielle Schnittstelle blockiert). Mit dem Befehl: \mint{bash}{mavproxy.py --master=/dev/serial0 --baudrate=921600} kann schließlich die Kommunikation des \gls{rpi} mit der Drohne verifiziert werden.
 
-Für das weitere Vorgehen wird das allzeit vorliegende Programm \textit{mavlink-routerd} verwendet. Es arbeitet als Server im Hintergrund und verbreitet MAVLINK-Nachrichten im Netzwerk. Auch \textit{mavproxy} stellt solch eine Funktionalität bereit, allerdings wird aufgrund von zu erwartenden Leistungseinbußen davon abgeraten\footnote{\url{https://ardupilot.org/mavproxy/docs/getting_started/forwarding.html}}. Die Konfiguration des \textit{mavlink-routerd} wird wie in \ref{fig:mav_controller} dargestellt angepasst. Dadurch kann sich jedes Netzwerkgerät (auch der \gls{rpi} selbst) über das \gls{udp}-Protokoll mit dem Flugcontroller verbinden. Auch kann ein PC/ Smartphone eine Verbindung zum Flugcontroller über das Netzwerk herstellen. Mit der neuen Konfiguration steht sowohl ein TCP-Server, als auch ein UDP-Server zur Verfügung. Eine Auswertung zur Verwendung des geeignetsten Protokolls folgt in \cref{chap:bench_tcp_udp}. In Bild \ref{fig:mavconf_mavproxy} ist das Vorgehen zur Verbindung über einen Netzwerkknoten und das erneute Ausführen des Funktionstests dargestellt.
+Für das weitere Vorgehen wird das allzeit vorliegende Programm \enquote{mavlink-routerd} verwendet. Es arbeitet als Server im Hintergrund und verbreitet \gls{mav}-Nachrichten im Netzwerk. Auch \textit{mavproxy} stellt solch eine Funktionalität bereit, allerdings wird aufgrund von zu erwartenden Leistungseinbußen davon abgeraten\footnote{\url{https://ardupilot.org/mavproxy/docs/getting_started/forwarding.html}\cite{ardupilotdevteamGettingStartedMAVProxy}}. Die Konfiguration des \textit{mavlink-routerd} wird wie in \ref{fig:mav_controller} dargestellt angepasst. Grundsätzlich kann jedes Netzwerkgerät nun eine TCP-Verbindung zum Flugcontroller aufbauen. Außerdem können spezielle Geräte die \gls{mav}-Nachrichten auch per UDP-Protokoll erhalten, müssen aber gesondert eingetrangen werden. Eine Auswertung zur Verwendung des geeignetsten Protokolls folgt in \cref{chap:bench_tcp_udp}. In Bild \ref{fig:mavconf_mavproxy} ist das Vorgehen zur Verbindung über einen Netzwerkknoten und das erneute Ausführen des Funktionstests mit \textit{mavproxy} dargestellt.
 
 \begin{figure}
   \centering
@@ -39,10 +39,10 @@ Per Knopfdruck kann hier die Funktion \textit{arm} ausgeführt werden und die Pr
 
 Um den Flugcontroller über das drahtlose Netzwerk des \gls{rpi} anzusteuern, muss das Programm QGroundControl manuell konfiguriert werden. Dazu muss eine Einstellung unter \textit{Comm Links} vorgemerkt werden, in welcher die IP-Adresse des \gls{rpi} und der \textit{TcpServerPort} des MAVLINK-Servers (siehe Bild \ref{fig:mavconf_new}) eingepflegt werden.
 
-Mithilfe des Programmes QGroundControl kann eine Drohne weiterhin ohne RC-Fernsteuerung geflogen werden. Es stehen Werkzeuge zur Planung eines \enquote{autonomen Fluges} bereit\footnote{\url{https://docs.qgroundcontrol.com/master/en/PlanView/PlanView.html}}. Dazu lassen sich GPS-Wegpunkte auf einer Karte anlegen, die die Drohne später selbstständig abfliegt. Außerdem stellt QGroundControl Funktionen zur Verfügung, eine Drohne mittels Joystick (virtuell oder per angeschlossenem Konsolen-Controller) zu steuern\footnote{\url{https://docs.px4.io/main/en/config/joystick.html}}.
+%Mithilfe des Programmes QGroundControl kann eine Drohne weiterhin ohne RC-Fernsteuerung geflogen werden. Es stehen Werkzeuge zur Planung eines \enquote{autonomen Fluges} bereit\footnote{\url{https://docs.qgroundcontrol.com/master/en/PlanView/PlanView.html}}. Dazu lassen sich GPS-Wegpunkte auf einer Karte anlegen, die die Drohne später selbstständig abfliegt. Außerdem stellt QGroundControl Funktionen zur Verfügung, eine Drohne mittels Joystick (virtuell oder per angeschlossenem Konsolen-Controller) zu steuern\footnote{\url{https://docs.px4.io/main/en/config/joystick.html}}.
 
 \subsubsection{Benchmark zur Verbindung von PC zum Flugcontroller}\label{chap:bench_tcp_udp}
-Zur Durchführung des Projektes steht keine physikalische RC-Fernsteuerung zur Verfügung, sondern es können nur Wegpunkte gesetzt oder ein Konsolen-Controller am PC verwendet werden. Für letzteren Fall ist es entscheident, dass die Daten über das mavlink-Protokoll zum Flugcontroller gesendet werden. Dabei ist die Verbindung über das Netzwerk des \gls{rpi} langsamer als die Verwendung einer echten Fernsteuerung. Um trotzdem die optimale Reaktionsfähigkeit zu erreichen, soll verglichen werden, ob die Verbindung über TCP-Protokoll oder UDP-Protokoll schneller ist\footnote{\url{https://stackoverflow.com/questions/47903/udp-vs-tcp-how-much-faster-is-it}}. Die entscheidenden Kriterien sind:
+Zur Durchführung des Projektes steht keine physikalische RC-Fernsteuerung zur Verfügung, sondern es können nur Wegpunkte gesetzt oder ein Konsolen-Controller am PC verwendet werden. Für letzteren Fall ist es entscheident, dass die Daten über das -Protokoll zum Flugcontroller gesendet werden. Dabei ist die Verbindung über das Netzwerk des \gls{rpi} langsamer als die Verwendung einer echten Fernsteuerung. Um trotzdem die optimale Reaktionsfähigkeit zu erreichen, soll verglichen werden, ob die Verbindung über TCP-Protokoll oder UDP-Protokoll schneller ist\footnote{\url{https://stackoverflow.com/questions/47903/udp-vs-tcp-how-much-faster-is-it}}. Die entscheidenden Kriterien sind:
 \begin{compactitem}
     \item Latenz: Reaktionsfähigkeit des Flugcontrollers
     \item Bandbreite: Auslastung des Datenkanals 
@@ -50,7 +50,7 @@ Zur Durchführung des Projektes steht keine physikalische RC-Fernsteuerung zur V
 
 [TODO]
 
-\subsection{Einbindung von Funktionalität mittels Docker-Containern}
+\section{Einbindung von Funktionalität mittels Docker-Containern}
 Weitere Funktionen der Drohne sollen mit \gls{ros} bereitgestellt werden. Da dieses nicht auf dem Betriebssystem des \gls{rpi} lauffähig ist, wird es als Docker Containern bereitgestellt.
 
 Aufbauend auf den Projekten \cite{wirthErweiterungBestehendenDrohne2022}, \cite{wirthErweiterungBestehendenDrohne2022a} sollen bestehende Docker-Container wiederverwendet werden. Eine erste Inspektion mit \texttt{docker images} zeigt, dass lediglich das \texttt{hello-world} Beispiel bereits heruntergeladen wurde und im Programmspeicher bereit liegt. Weiterhin zeigt der Befehl \texttt{docker ps -a} dass auch nur dieses Beispiel bisher ausgeführt wurde. Im bestehenden Quellcode enthalten sind verschiedene Tests. Schon der Test 1 importiert einen Container aus \enquote{arm64v8/ros:galactic}. Das besagte Abbild ist für eine 64-bit ARM Architektur gedacht und damit auf dem gelieferten Betriebssystem nicht lauffähig. In weiteren Tests 3 und 4 wurde dieser Mangel erkannt und versucht zu korrigieren.
@@ -80,9 +80,10 @@ Dort ist sichtbar, dass mittels \enquote{websocket} die meisten Daten übertrage
 \paragraph*{Test 4} ist unvollständig. Er ist in keiner Ausarbeitung dokumentiert. Die Dateien von Server und Client sind dieselben wie in Test 3. Es sollte wohl die Kommunikation über \acrshort{ros} erprobt werden, dazu kam es allerdings nicht.
 
 \paragraph*{Ultraschallsensoren} benötigen weiterhin eine Schnittstelle um über \acrshort{ros} Daten zu verbreiten. Eine Schnittstelle wurde ansatzweise Entwickelt und steht als \enquote{ros2\_ultrasonic\_sensor} auf GitHub\footnote{\url{https://github.com/dippa-1/ros2_ultrasonic_sensor}} zur Verfügung. Das Repository enthält einen angepassten Quellcode basierend auf der Beispielimplementation von \acrshort{ros}2\footnote{\url{https://docs.ros.org/en/galactic/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html}}. Es wird beispielhaft ein Ultraschallsensor ausgelesen und der Messwert publiziert.
+
 [Da zum Testen eine funktionsfähige ROS Umgebung notwendig wäre, kann ich hiermit derzeit nichts anfangen.]
 
-\subsection{Experiment: Positionsbestimmung der Drohne mit GPS}
+\section{Experiment: Positionsbestimmung der Drohne mit GPS}
 In \cite[Kapitel 6.10; 7.4 und folgende]{wirthErweiterungBestehendenDrohne2022a} werden GPS-Daten von der Drohne und Bodenstation ausgelesen. Anschließend wird die Drohne angewiesen zu den Koordinaten der Bodenstation zu fliegen.
 
 Um die Zuverlässigkeit der Navigation zu überprüfen wurde folgender Versuch durchgeführt:
@@ -90,9 +91,9 @@ Um die Zuverlässigkeit der Navigation zu überprüfen wurde folgender Versuch d
 Die Drohne wird im eingeschaltenen Zustand manuell bewegt. Dabei wird das GPS Signal aufgezeichnet. Gleichzeitig wird ein weiteres GPS Gerät mitgeführt, welches ebenfalls die Bewegung aufzeichnet. Anschließend werden die Aufzeichnungen miteinander verglichen.
 \end{minipage}
 
-Zur Durchführung wird auf dem Bordcomputer (\gls{rpi}) das Programm \texttt{mavproxy} (siehe ...) gestartet. Es legt während es aktiv ist, automatisch eine Log-Datei mit diversen Daten zur Drohne an. Die GPS Daten können nach Beenden des Programmes \texttt{mavproxy} mit dem Programm \texttt{mavtogpx} (in mavproxy-Suite enthalten) entschlüsselt werden. Neben der Drohne werden 2 Smartphones angewiesen, ihre aktuelle Position zu tracken. Anschließend wird ein kleiner Spaziergang mit allen Geräten gemacht. Um möglichst diverse Ergebnisse zu erzielen in 3 Kategorien: in der Ebene, Bergauf, Bergab.
+Zur Durchführung wird auf dem Bordcomputer (\gls{rpi}) das Programm \textit{mavproxy} gestartet. Es legt während es aktiv ist, automatisch eine Log-Datei mit diversen Daten zur Drohne an. Die GPS Daten können nach Beenden des Programmes mit dem Programm \textit{mavtogpx} (in \textit{mavproxy}-Suite enthalten) entschlüsselt werden. Neben der Drohne werden zwei Smartphones angewiesen, ihre aktuelle Position zu tracken. Anschließend wird ein kleiner Spaziergang mit allen Geräten gemacht. Um möglichst diverse Ergebnisse zu erzielen in 3 Kategorien: in der Ebene, Bergauf, Bergab.
 
-Zur Auswertung wurden die Daten in GoogleMaps hochgeladen. Die Bilder \ref{fig:bench_gps} zeigen die zurückgelegte Strecke. Auf den Karten sind jeweils farbige Spuren der Smartphones und der Drohne eingezeichnet. Bei näherer Betrachtung (reinzoomen in Maps ist möglich, hier dargestellt ist immer der größtmögliche Ausschnitt) ist zu sehen, dass die Spuren teilweise stark voneinander abweichen. Diese Diskrepanz vergrößert sich teilweise mit der zurückgelegten Strecken, was bedeutet, dass eine aus größerer Entfernung losgeschickte Drohne das Ziel unter Umständen weit verfehlt.
+Zur Auswertung wurden die Daten in GoogleMaps hochgeladen. Die Bilder \ref{fig:bench_gps} zeigen die zurückgelegte Strecke. Auf den Karten sind jeweils farbige Spuren der Smartphones und der Drohne eingezeichnet. Bei näherer Betrachtung (reinzoomen in Maps ist möglich, hier dargestellt ist immer der größtmögliche Ausschnitt) ist zu sehen, dass die Spuren teilweise um mehrere Meter voneinander abweichen. Diese Diskrepanz vergrößert sich teilweise mit der zurückgelegten Strecken, was bedeutet, dass eine aus größerer Entfernung losgeschickte Drohne das Ziel unter Umständen weit verfehlt.
 
 \begin{figure}[h!]
     \centering
@@ -103,7 +104,7 @@ Zur Auswertung wurden die Daten in GoogleMaps hochgeladen. Die Bilder \ref{fig:b
     \label{fig:bench_gps}
 \end{figure}
 
-Weiterhin kann aus den GPS Daten Höhe, Geschwindigkeit und Neigung über die Zeit beobachtet werden. Die Drohne nimmt insgesamt mehr Messpunkte als die Smartphones auf, was ihr eine größere Genauigkeit und Zuverlässigkeit verleihen sollte. Auch gibt es bei den Smartphones teilweise Aussetzer bei der Aufzeichnung (entweder Signalverlust oder Software-Probleme). In Bild \ref{fig:bench_gps_elevation} zu sehen ist das Höhenprofil beim Bewegen der Drohne und eines Smartphones. Hätte die Drohne schwerwiegende Abweichungen während des Fluges könnte dies fatale Folgen haben. Auch ist das Profil der Drohne insgesamt ruhiger und glatter, was für gute Messwerte spricht.  
+Weiterhin kann aus den GPS Daten Höhe, Geschwindigkeit und Neigung über die Zeit beobachtet werden. Die Drohne nimmt insgesamt mehr Messpunkte als die Smartphones auf, was ihr eine größere Genauigkeit und Zuverlässigkeit verleihen sollte. Auch gibt es bei den Smartphones teilweise Aussetzer bei der Aufzeichnung, die auf Signalverlust oder Software-Probleme zurückzuführen sind. In Bild \ref{fig:bench_gps_elevation} zu sehen ist das Höhenprofil beim Bewegen der Drohne und eines Smartphones. Hätte die Drohne schwerwiegende Abweichungen während des Fluges könnte dies fatale Folgen haben. Auch ist das Profil der Drohne insgesamt ruhiger und glatter, was für gute Messwerte spricht.  
 
 \begin{figure}[h!]
     \centering
@@ -114,20 +115,19 @@ Weiterhin kann aus den GPS Daten Höhe, Geschwindigkeit und Neigung über die Ze
     \label{fig:bench_gps_elevation}
 \end{figure}
 
-Um die Genauigkeit des GPS zu verbessern gibt es verschiedene Möglichkeiten\footnote{\url{https://ardupilot.org/copter/docs/common-rtk-correction.html}}. In der Praxis eingesetzt bei Landwirtschaftlichen Maschinen (Zentimetergenaue Fahrzeugführung) wird die zweite auf der Website aufgeführte Methode: über das Internet wird ein Korrektursignal abgerufen und dem GPS-Modul zugespielt. Diese Methode könnte auch einfach mithilfe des \gls{rpi} und einem GSM-Modul (Mobiles Internet über 3G) implementiert werden.
+Um die Genauigkeit des GPS zu verbessern gibt es verschiedene Möglichkeiten\footnote{\url{https://ardupilot.org/copter/docs/common-rtk-correction.html}}. In der Praxis eingesetzt bei Landwirtschaftlichen Maschinen (zentimetergenaue Fahrzeugführung) wird die zweite auf der Website aufgeführte Methode: über das Internet wird ein Korrektursignal abgerufen und dem GPS-Modul zugespielt. Diese Methode könnte auch einfach mithilfe des \gls{rpi} und einem GSM-Modul (Mobiles Internet über 3G) implementiert werden.
 
-\subsection{Auslesen von Sensor-Daten}
-Der Flugcontroller stellt verschiedene Sensoren bereit. Zusätzlich waren im ersten Projekt Ultraschallsensoren an den \gls{rpi} angeschlossenen. 
+%\subsection{Auslesen von Sensor-Daten} Der Flugcontroller stellt verschiedene Sensoren bereit. Zusätzlich waren im ersten Projekt Ultraschallsensoren an den \gls{rpi} angeschlossenen. 
 
-\subsubsection{Ultraschallsensoren am RPI}
+\section{Ultraschallsensoren am RPI}
 Zuerst sollen die Ultraschall-Sensoren mit dem \gls{rpi} verbunden und getestet werden, um die Wiederverwendbarkeit zu bewerten. %Derzeit sind an der Drohne 4 Ultraschallsensoren verbaut. Davon sind zwei nach vorn gerichtet, und jeweils einer nach oben und unten. 
 
 In \cite[Kapitel 4.3.9]{wirthErweiterungBestehendenDrohne2022} ist beschrieben dass die Signale der Sensoren mit $5V$ anliegen, aber auf $3,3V$ herabgesetzt werden müssen um die Pins des \gls{rpi} nicht zu beschädigen.
 Die Beschreibung sieht vor dazu einen Spannungsteiler einzusetzen. Bei genauem betrachten des Schaltplans fällt auf, dass der Spannungsteiler falsch gebaut wurde, und nicht die gewünschte Funktion erfüllt. Um die Pins des \gls{rpi} nicht doch zu beschädigen muss eine alternative Lösung gefunden werden. 
 
 Weiterhin wurde ein Python-Script verwendet um die Pins am \gls{rpi} zu schalten/lesen. 
-Zum anstoßen einer Messung soll das Trigger-Signal für $1\mu s$ auf \texttt{HIGH} (logisch 1) gesetzt werden. Um die Zeitverzögerung zu implementieren, wurde die Funktion \enquote{wait} verwendet. Eine Messung mit dem Oszilloskop zeigt, dass besagtes \enquote{wait} im Bereich von 200us liegt.\newline
-Eine ähnliche Ungenauigkeit tritt beim Auslesen des ECHO-Signals auf. Die Bibliothek des \gls{rpi} wird verwendet um die Pins zu Pollen, was den Prozessor unnötig auslastet. Messungen mit konstant eingespeister Einschaltdauer (zu messendes Signal von Signalgenerator erzeugt) ergaben, dass immer 3 von 4 Messwerten gleich, der vierte aber eine Abweichung von ca. 8\% hatte.\\
+Zum anstoßen einer Messung soll das Trigger-Signal für $1\mu s$ auf \texttt{HIGH} (logisch 1) gesetzt werden. Um die Zeitverzögerung zu implementieren, wurde die Funktion \enquote{wait} verwendet. Eine Messung mit dem Oszilloskop zeigt, dass besagtes \textit{wait} im Bereich von 200us liegt.\newline
+Eine ähnliche Ungenauigkeit tritt beim Auslesen des ECHO-Signals auf. Die Bibliothek des \gls{rpi} wird verwendet um die Pins zu Pollen, was den Prozessor unnötig auslastet. Messungen mit konstant eingespeister Einschaltdauer (zu messendes Signal von Signalgenerator erzeugt) ergaben, dass immer 3 von 4 Messwerten gleich, der vierte aber eine Abweichung von ca. 8\% hatte.\newline
 Somit kann mit Python keine genaue Messung der Ultraschallsensoren durchgeführt werden. 
 
 \paragraph*{Verwendung eines Aurduino zum Auslesen der Sensoren}
@@ -135,10 +135,10 @@ Zur Lösung der Problemene kann bspw. zusätzlich ein Arduino verwendet werden, 
 
 Zum Senden digitaler Messwerte muss ein Protokoll verwendet werden. Die UART-Pins des \gls{rpi} sind bereits mit dem Flugcontroller verbunden. Für den Anwendungszweck bietet sich das I2C-Protokoll an. Es erlaubt eine direkte Verbindung des Arduino mit dem \gls{rpi}, denn es werden vom Arduino keine $5V$ aktiv geschalten sondern nur der Leitungsbus auf Masse heruntergezogen.
 
-Die Ultraschallsensoren\footnote{\url{https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf}} haben eine Reichweite von ca. $2cm$ bis $4m$ und eine Genauigkeit von ca. $3mm$. Für die Entwicklung wird die maximale Distanz auf $3.8m$ festgelegt. Es wird ein kleinerer Wert als im Datenblatt angenommen, da der Idealwert nur bei stillstehenden glatten Flächen erreicht werden kann. Im Datenblatt wird empfohlen, zwischen aufeinanderfolgenden Messungen mindestens $60ms$ abzuwarten, um Fehleinstreuungen durch weitere Ultraschallechos zu vermeiden. Um weitere Fehler zu vermeiden wird diese Zeit vorerst auch zwischen den Messungen der 4 Sensoren eingehalten. Eine weitere Verzögerung entsteht durch das Messen selbst (maximal $\frac{380cm}{0.5 \times 0.034\frac{cm}{s}}\approx 22352\mu s$), diese wird vorsorglich von der jeweiligen Wartezeit abgezogen. Die minimale Periode der Sensordaten beträgt somit $4 \times 60ms=240ms$. Grob gesagt, entspricht die Frequenz der Sensordaten somit $4Hz$.
+Die Ultraschallsensoren haben laut Datenblatt \cite{elecfreaksUltrasonicRangingModule2023} eine Reichweite von ca. $2cm$ bis $4m$ und eine Genauigkeit von ca. $3mm$. Im Datenblatt wird empfohlen, zwischen aufeinanderfolgenden Messungen mindestens $60ms$ abzuwarten, um Fehleinstreuungen durch weitere Ultraschallechos zu vermeiden. Um weitere Fehler zu vermeiden wird diese Zeit vorerst auch zwischen den Messungen der 4 Sensoren eingehalten. Eine weitere Verzögerung entsteht durch das Messen selbst (maximal $\frac{380cm}{0.5 \times 0.034\frac{cm}{s}}\approx 22352\mu s$), diese wird vorsorglich von der jeweiligen Wartezeit abgezogen. Die minimale Periode der Sensordaten beträgt somit $4 \times 60ms=240ms$. Grob gesagt, entspricht die Frequenz der Sensordaten somit $4Hz$.
 %Dies ist nicht gerade hoch und könnte bei schnellen Flügen leicht zu Fehlern führen.
 
-Ein weiteres Problem ist das durch die Ultraschallsensoren verursachte Rauschen der Messwerte. Bei Messungen im Raum mit konstantem Abstand zu Obejekten ergaben sich Abweichungen zwischen 2 Messungen von ca. $1\%-2\%$, siehe Bild \ref{fig:ultrasonic_noise}, \ref{fig:ultrasonic_scatter}. Im linken Bild sind nacheinander die Messwerte mehrerer Ultraschallsensoren aufgeführt, das rechte Bild zeigt den zeitlichen Verlauf von Messdaten. Selbst bei Stillstand (Anfang und Ende der Messung) sind Schwankungen in den Messwerten zu sehen.
+Ein weiteres Problem ist das durch die Ultraschallsensoren verursachte Rauschen der Messwerte. Bei Messungen im Raum mit konstantem Abstand zu Objekten ergaben sich Abweichungen zwischen 2 Messungen von ca. $1\%-2\%$, siehe Bild \ref{fig:ultrasonic_noise}, \ref{fig:ultrasonic_scatter}. Im linken Bild sind nacheinander die Messwerte mehrerer Ultraschallsensoren aufgeführt, das rechte Bild zeigt den zeitlichen Verlauf von Messdaten. Selbst bei Stillstand (Anfang und Ende der Messung) sind Schwankungen in den Messwerten zu sehen.
 
 Auch haben die Ultraschallsensoren ein Problem mit Bewegungen. In Bild \ref{fig:ultrasonic_scatter} wurde der Sensor zuerst in Richtung Decke gehalten (Beginn bei ca. $8s$ auf der x-Achse). Dann wurde er waagerecht gedreht, in den Raum zeigend. Kann der Sensor keinen Wert erfassen, kommt es auf dem Arduino zu einem Timeout und es wird $0$ zurückgegeben (ca. bei $11s$). Zu beachten sind die starken Abweichungen während den Bewegungen: es kommt immer wieder zu starken Einbrüchen und Anstiegen (bspw. bei $14s$) durch teilweisen Verlust des Echo-Signals.
 
@@ -151,19 +151,22 @@ Auch haben die Ultraschallsensoren ein Problem mit Bewegungen. In Bild \ref{fig:
     \label{fig:ultrasonic_tests}
 \end{figure}
 
-Durch den Feldversuch wird ersichtlich, dass Ultraschallsensoren nur funktionieren, wenn sie nahezu senkrecht auf Flächen gerichtet werden. Somit können auch keine Hindernisse (wie bspw. Wände) detektiert werden, auf die sich die Drohne schräg zubewegt. Nicht messbare Entfernungen (zu nahe oder zu große Entfernung) werden beim weiteren Vorgehen durch die Entfernung von $4m$ ersetzt und die maximal messbare Entfernung der Sensoren auf $3m$ begrenzt.
+Durch den Feldversuch wird ersichtlich, dass Ultraschallsensoren nur funktionieren, wenn sie nahezu senkrecht auf Flächen gerichtet werden. Somit können auch keine Hindernisse (wie bspw. Wände) detektiert werden, auf die sich die Drohne schräg zubewegt. Da der maximale Entfernungswert nur auf glatten Flächen erreicht werden kann, wird maximale Distanz auf $3.8m$ festgelegt. Nicht messbare Entfernungen (zu nahe oder zu große Entfernung) werden beim weiteren Vorgehen durch die Entfernung von $4m$ ersetzt.
 
-Um die Messwerte der Sensoren sinnvoll verarbeiten zu können ist weiteres Filtern notwendig. Eine einfache Implementation für einen Filter sind Moving Average Filter, oder speziell für diesen Anwendungszweck, wie in \footnote{\url{https://renegaderobotics.org/filtering-sensor-data/}} beschriebene Median Filter. Bei dem zuletzt beschriebenen Verfahren werden manuell Grenzen festgelegt, welche Messwerte gefiltert werden müssen. Für die Messungen wurden Abweichungen kleiner 1\% ignoriert und größer 3\% gefiltert. Vom beschriebenen Vorgehen zum filtern wurde aber abgeichen und anstatt des Medians jeweils der Mittelwert der letzten Messwerte, gespeichert in einem Filter-Array, errechnet. In Bild \ref{fig:ultrasonic_filters} ist eine weitere Messung dargestellt. Die besten Resultate (wenige Sprünge, steile Anstiege) liefert der \enquote{Median Filter 1} und soll im Projekt weiterhin verwendet werden.
+Um die Messwerte der Sensoren sinnvoll verarbeiten zu können ist weiteres Filtern notwendig. Eine einfache Implementation für einen Filter sind Moving Average Filter, oder speziell für diesen Anwendungszweck, wie in \cite{superrenegadeFilteringSensorData2018} gezeigt: Median Filter. Bei dem zuletzt beschriebenen Verfahren werden manuell Grenzen festgelegt, welche Messwerte gefiltert werden müssen. Für die Messungen wurden Abweichungen kleiner 1\% ignoriert und größer 3\% gefiltert. Vom beschriebenen Vorgehen zum Filtern wurde aber abgeichen: anstatt des Medians wurde jeweils der Mittelwert der letzten Messwerte, gespeichert in einem Filter-Array, errechnet. In Bild \ref{fig:ultrasonic_filters} ist eine weitere Messung dargestellt. Die besten Resultate (wenige Sprünge, steile Anstiege) liefert der \enquote{Median Filter 1} und soll im Projekt weiterhin verwendet werden.
 
 \begin{figure}[!h]
 	\includegraphics[width=\linewidth]{images/ultrasonic_cmp_filter.png}
-	\caption{Messung mit einem Ultraschallsensor. Zu sehen: oben ungefilterte Messwerte; Median Filter 1 pflegt Sprünge in Messdaten direkt in Filter-Array ein aber berechnet Durchschnitt; Median Filter 2 pflegt berechneten Durchschnittswert in Filter-Array ein; Moving Average berechnet immer den Durchschnittswert der vergangenen Messwerte.}
+	\caption{Messung mit einem Ultraschallsensor. Zu sehen: oben ungefilterte Messwerte; Median Filter 1 pflegt Sprünge in Messdaten direkt in Filter-Array ein aber berechnet Durchschnitt; Median Filter 2 berechnet erst Durchschnittswert und pflegt diesen in ein Filter-Array ein; Moving Average berechnet immer den Durchschnittswert der vergangenen Messwerte.}
 	\label{fig:ultrasonic_filters}
-  \end{figure} 
+  \end{figure}
+
+Weitere Experimente mit dem Sensor im praktischen Einsatz zeigten, dass es besser ist, Messwertänderungen unter 2\% zu ignorieren und ab 5\% zu filtern. 
 
 [TODO: neue Bibliothek entwerfen, am besten gleich mit ROS]
 
-\subsubsection{Einspeisen von Parameterwerten der Drohne für ROS}
+%\subsubsection{Einspeisen von Parameterwerten der Drohne für ROS}
 
 [TODO: vielliecht gibt es schon eine "direkte Einspeisung", muesste ich mich mal belesen]
+
 [TODO: Alternativ kann der Flugcontroller auch einen EKF berechnen]

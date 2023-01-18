@@ -19,15 +19,14 @@ Verfügbare \gls{uav} implementieren bereits automatische Funktionen der unteren
 \end{compactenum}
 
 \begin{figure}[!h]
-	\includegraphics[width=\linewidth]{images/drone_autonomy_levels.png}
-	\caption{Einteilung Automation von \gls{uav}: Vom niedrigsten Level (0) zum höchsten Level (5) steigt der Automationsgrad, von \cite{cloudfactoryBreakingLevelsDrone}).}
+	\includegraphics[width=0.7\linewidth]{images/drone_autonomy_levels.png}
+	\caption[Einteilung Automationsklassen von \gls{uav}]{Einteilung Automationsklassen von \gls{uav}: Vom niedrigsten Level (0) zum höchsten Level (5) steigt der Automationsgrad, von \cite{cloudfactoryBreakingLevelsDrone}).}
 	\label{fig:automation_levels}
 	\end{figure}
 
 Das \gls{lba} erlässt zudem Regelungen, wonach ein autonomer Flug \enquote*{[...] derzeit nicht zulässig [ist]; Fernpiloten müssen jederzeit eingreifen können. [...]}\cite{openuavadminDatenverbindungUndFlugmodi}.  
 
 Der bisherige Stand des Projektes steht im Übergang von Automationsklasse 3 auf Klasse 4. Allerdings fehlen generalisierte Anwendungsfälle (später gezeigt) sodass die Drohne noch nicht wie gewünscht, Hindernissen ausweicht (das bisherige Verhalten beschränkt sich auf sicheres Landen beim Erkennen von Hindernissen).
-
 
 %
 %\begin{figure}[!h]
@@ -96,10 +95,10 @@ Das Prinzip der Ultraschallortung besteht aus 3 Schritten:
 \end{compactenum}
 
 Verwendet werden Ultraschallsensoren an der Drohne, welche Messimpulse in die Umgebung aussenden. Für eine exakte Auswertung der Signallaufzeit müssten Umgebungstemperatur, Luftdruck und Luftfeuchte bekannt sein. Den größten Einfluss spielt dabei die Temperatur. Druck und Feuchte wirken nur mit jeweils maximal auf das Ergebnis ein 5\% bzw. 2\%.\newline
-Die Formel zur Bestimmtung der Entfernung eines Objektes lautet ist gegeben in Formel \ref{mat:dist_by_t}. Benötigt wird die Schallgeschwindigkeit $c_{20}$ bei $20 C$ und der Temperaturkoeffizient $\alpha_{20}$\cite[Seite 152]{grudenSensorikUndMesswertverarbeitung2022}.
+Die Formel zur Bestimmtung der Entfernung eines Objektes lautet ist gegeben in Formel \ref{mat:dist_by_t}. Benötigt wird die Schallgeschwindigkeit $c_{20}$ bei $20$\textcelsius und der Temperaturkoeffizient $\alpha_{20}$\cite[Seite 152]{grudenSensorikUndMesswertverarbeitung2022}.
 \begin{align}
 	s &=\frac{1}{2}c\cdot t\\
-	&=\frac{1}{2}c_{20}(1+\alpha_{20}(\vartheta-20))	\label{mat:dist_by_t}
+	&=\frac{1}{2}c_{20}(1+\alpha_{20}(\vartheta-20\textrm{\textcelsius})) t	\label{mat:dist_by_t}
 \end{align}
 
 \section{Bilderkennung und Obstacle Avoidance}
