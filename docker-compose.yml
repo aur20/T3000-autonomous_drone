@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  airsim:
+    image: airsim_ros:latest
+    build: 
+      dockerfile: ./AirSim/Dockerfile
+    network_mode: host
+    environment:
+      - NETWORK=$NETWORK
+    command: /bin/bash -c "source ~/catkin_ws/devel/setup.bash && \
+      source /AirSim/ros/devel/setup.bash && \
+      roslaunch --wait airsim_ros_pkgs airsim_node.launch output:=screen host:=$NETWORK required:=true"
+  p2c:
+    build: 
+      dockerfile: ./p2c/Dockerfile
+    network_mode: host
+    depends_on:
+      - airsim
+    command: /bin/bash -c "source ~/catkin_ws/devel/setup.bash && \
+      roslaunch --wait depth_image_proc_custom p2c2.launch"
+  avoidance:
+    image: airsim_avoidance:latest
+    build: 
+      dockerfile: ./PX4-Avoidance/Dockerfile
+    depends_on:
+      - airsim
+    network_mode: host
+    command: /bin/bash -c "source ~/catkin_ws/devel/setup.bash && \
+      roslaunch --wait local_planner local_planner_mk1.launch"
+  rviz:
+    build:
+      dockerfile: ./rviz/Dockerfile
+    network_mode: host
+    environment:
+      - LIBGL_ALWAYS_INDIRECT=$LIBGL_ALWAYS_INDIRECT
+      - DISPLAY=$DISPLAY
+    command: /bin/bash -c "source ~/catkin_ws/devel/setup.bash && \
+      source /AirSim/ros/devel/setup.bash && \
+      roslaunch --wait airsim_ros_pkgs rviz.launch"
+  graph2:
+    image: ros_avoidance:latest
+    network_mode: host
+    environment:
+      - LIBGL_ALWAYS_INDIRECT=$LIBGL_ALWAYS_INDIRECT
+      - DISPLAY=$DISPLAY
+    command: rqt

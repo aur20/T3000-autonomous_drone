@@ -1,0 +1,39 @@
+<!-- FROM https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_tutorial_pkgs/launch/front_stereo_and_center_mono/depth_to_pointcloud.launch -->
+<launch>
+    <!-- start the airsim-ros-converter, line 5-21 -->
+    <!-- FROM https://github.com/microsoft/AirSim/blob/main/ros/src/airsim_ros_pkgs/launch/airsim_node.launch -->
+    <arg name="output" default="log"/>
+	<arg name="publish_clock" default="false"/>
+	<arg name="is_vulkan" default="true"/>
+	<arg name="host" default="localhost" />
+
+	<node name="airsim_node" pkg="airsim_ros_pkgs" type="airsim_node" output="$(arg output)">
+		<param name="is_vulkan" type="bool" value="false" /> 
+		<!-- ROS timer rates. Note that timer callback will be processed at maximum possible rate, upperbounded by the following ROS params -->
+		<param name="update_airsim_img_response_every_n_sec" type="double" value="0.05" /> 
+		<param name="update_airsim_control_every_n_sec" type="double" value="0.01" />
+		<param name="update_lidar_every_n_sec" type="double" value="0.01" />
+		<param name="publish_clock" type="bool" value="$(arg publish_clock)" />
+		<param name="host_ip" type="string" value="$(arg host)" />
+	</node>
+
+	<!-- Static transforms -->
+	<include file="$(find airsim_ros_pkgs)/launch/static_transforms.launch"/>
+
+	<!-- docs: https://wiki.ros.org/nodelet/Tutorials/Running%20a%20nodelet -->
+	<!-- docs: http://wiki.ros.org/depth_image_proc -->
+	<!-- docs: https://wiki.ros.org/openni_launch -->
+	<!-- docs: https://gist.github.com/bhaskara/2400165 -->
+	    
+	<!-- Nodelet manager -->
+	<node pkg="nodelet" type="nodelet" args="manager" name="depth_to_pointcloud_manager" output="screen"/>
+
+	<!-- Nodelets! -->
+	<!-- Convert it into a point cloud -->
+	<node pkg="nodelet" type="nodelet" name="airsim_depth2cloud" args="load depth_image_proc/point_cloud_xyz_radial depth_to_pointcloud_manager" output="screen">
+		<remap from="depth_registered/image_rect" to="/airsim_node/PX4/mk1/DepthPerspective"/>
+		<remap from="depth_registered/points" to="/airsim_node/PX4/mk1/DepthPerspective/registered/points"/>
+		<remap from="rgb/image_rect_color" to="/airsim_node/PX4/mk1/Scene"/>
+		<remap from="rgb/camera_info" to="/airsim_node/PX4/mk1/DepthPerspective/camera_info"/>
+	</node>
+</launch>
