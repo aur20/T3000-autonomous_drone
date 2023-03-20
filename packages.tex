@@ -1,0 +1,68 @@
+
+%Farbdefinitionen
+\usepackage[hyperref,dvipsnames]{xcolor}
+
+%%%
+% Required for custom acronyms/glossaries style
+% Left aligned Columns in tables with fixed width
+% see http://tex.stackexchange.com/questions/91566/syntax-similar-to-centering-for-right-and-left
+\usepackage{ragged2e}
+%%%
+
+%%%
+% Abkürzungsverzeichnis
+\usepackage{scrwfile} % Wichtig, ansonsten erscheint "No room for a new \write"
+% siehe http://www.dickimaw-books.com/cgi-bin/faq.cgi?action=view&categorylabel=glossaries#glsnewwriteexceeded
+\usepackage[acronym,indexonlyfirst,nomain]{glossaries}
+\renewcommand*{\acronymname}{Abkürzungsverzeichnis}
+\renewcommand*{\glsgroupskip}{}
+\makenoidxglossaries
+
+% von https://tex.stackexchange.com/questions/73160/table-with-tabularx-and-multirow
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{tabularx}
+
+%%%
+% ggf.in der Endversion komplett rausnehmen. dann auch \href in commands.tex aktivieren
+% Alle Optionen nach \hypersetup verschoben, sonst crash
+%
+%\usepackage[]{hyperref}%siehe auch: "Praktisches LaTeX" - www.itp.uni-hannover.de/~kreutzm
+%
+%% Da es mit KOMA 3 und xcolor zu Problemen mit den global Options kommt MÜSSEN die Optionen so gesetzt werden.
+%
+%\ifdeutsch
+\usepackage[ngerman]{hyperref}
+\usepackage[ngerman,capitalise,nameinlink,noabbrev]{cleveref}
+\crefname{section}{Kapitel}{Kapitel}
+%\else
+%\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+%\fi
+
+
+% Eigene Farbdefinitionen ohne die Namen des xcolor packages
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{black}{rgb}{0,0,0}
+
+\hypersetup{
+    breaklinks=true,
+    bookmarksnumbered=true,
+    bookmarksopen=true,
+    bookmarksopenlevel=1,
+    breaklinks=true,
+    colorlinks=true,
+    pdfstartview=Fit,
+    pdfpagelayout=TwoPageRight, % zweiseitige Darstellung: ungerade Seiten rechts im PDF-Viewer - siehe auch http://tex.stackexchange.com/a/21109/9075
+    filecolor=darkblue,
+    urlcolor=darkblue,
+    linkcolor=black,
+    citecolor=black
+}
+%
+%%%
+
+% erweitertes Enumerate, NICHT paralist
+\usepackage{enumitem}
+\setlist[enumerate]{noitemsep}
+\setlist[itemize]{noitemsep}
+\setlist[description]{noitemsep}

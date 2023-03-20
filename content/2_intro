@@ -1,0 +1,120 @@
+\chapter{Einführung in Projekt}
+Dieses Projekt dient der Verwirklichung Autonomen Fliegens.
+
+\textbf{Ziele der Arbeit:}
+\begin{itemize}
+    \item Erweiterung der Sensorfähigkeit der Drohne um Tiefenkamera
+    \item Verwendung von Tiefenbildern und Ultraschallsensordaten für Hinderniserkennung 
+    \item Autonomer Flug der Drohne um große, flächige Hindernisse wie Häuser oder Automobile unter Verwendung der Software \textit{Avoidance}\ref{chap:avoidance}
+\end{itemize}
+
+\textbf{Optionale Erweiterungen:}
+\begin{itemize}
+    \item Verfeinerungen und Anpassungen der Software \textit{Avoidance}, sodass kleinere, strukturreiche Hindernisse (bspw. Bäume) erkannt und umflogen werden
+    \item Einführung kamerabasierte Zielerkennung als Alternative zur GPS-gestützten Zielführung
+\end{itemize}
+
+\textbf{Geplantes Vorgehen:}
+\begin{enumerate}
+    \item Vervollständigen der Simulation aus vorhergehendem Projektteil: die simulierte Drohne soll im Flug allein mit Kamerabildern und der Software \textit{Avoidance} Hindernissen ausweichen 
+    \item Beschaffung und Installation Tiefenkamera an realer Drohne
+    \item Aufspielen der Software \textit{Avoidance} auf reale Drohne
+    \item Flugtests mit Tiefenkamera
+    \item Einbinden von Ultraschallsensordaten in Softwareverarbeitung von \textit{Avoidance}
+    \item Flugtests mit Tiefenkamera und Ultraschallsensordaten
+    \item mehr Details: was funktioniert in der Endanwendung, was sind die Schritte in der Simulation, ,was wird simuliert
+\end{enumerate}
+
+Im weiteren Verlauf der Arbeit spielen folgende Begriffe eine wichtige Rolle:\\
+\begin{minipage}[t]{\linewidth}
+\begin{description}
+    \item[Bodenstation:] 
+    \item[\gls{imu}:] Zusammenfassung der Sensorn Beschleunigungssensor, Kompass und Gyroskop
+    \item[\gls{rpi}:] Einplatinencomputer, eingesetzt als Bordcomputer
+    \item[\gls{ros}:] Metabetriebssystem zur Vernetzung von Roboterbestandteilen (Aktor-Sensor-Verknüpfung), Überwachung und Steuerung von Prozessen
+    \item[Docker:] Containerisierung von Betriebssystemumgebungen. Beispielsituation:
+    \begin{itemize}
+        \item auf dem \gls{rpi} läuft Raspberry Pi OS (Linux Debian), genannt Host-Betriebssystem
+        \item unabhängig davon kann innerhalb eines Containers Linux Ubuntu installiert werden
+        \item im Container sind speziell festgelegte Bibliotheken, Umgebungsvariablen, Speichergeräte und Netzwerke zum Programmbetrieb vorhanden, es können Programme gestartet werden, die nicht auf dem Host-Betriebssystem lauffähig sind
+        \item im Container gestartete Programme laufen parallel zu Programmen auf dem Host-Betriebssystem, sie sind trotzdem im Prozessmanager (\textit{top}) von Raspberry Pi OS sichtbar
+    \end{itemize}  
+    \item[PX4:] Offizielle Software der Dronecode Stiftung mit der verschiedene $\mu C$, embedded System, oder PC zum Steuern von Robotern, Fahrzeugen oder Drohnen ausgestattet werden können
+    \item[Avoidance:] Projekt im Umfeld von PX4 zur autonomen Steuerung von Drohnen in unbekanntem Umfeld. Aufgeteilt in 3 Unterprojekte:
+    \begin{itemize}
+        \item Local Planner
+        \item Global Planner
+        \item Safe Landing Planner  
+    \end{itemize}
+    Im derzeitigen Projekt wird der Local Planner umgesetzt.
+    \item[...]
+\end{description}
+\end{minipage}
+
+\section{Beschreibung des Systems}
+Zunächst in Tabelle \ref{tab:system_intro} aufgelistet, der Aufbau des Systems Drohne und Bodenstation in der einfachen Ausführung ohne jegliche automone Fähigkeiten. Sie bilden zusammen eine Verwaltungseinheit, denn der Drohne müssen Fluganweisungen von der Bodenstation eingespeist werden.\hfill\\
+
+\begin{table}[!ht]
+    \label{tab:system_intro}
+    \caption{Systemübersicht Drohne und Bodenstation}
+    \begin{tabularx}{\textwidth}{l | X | X | X }
+     & \multicolumn{2}{c |}{Drohne} & \\
+    & Flugcontroller & Bordcomputer & Bodenstation \\ \hline
+    Funktion & Autopilot-Software liest Sensoren und steuert Aktoren der Drohne & Bereitstellung WLAN-Netzwerk zur Verbindung von Autopilot und Bodenstation & Parametrierung und Steuerung der Drohne\hfill \\ \hline
+    Hardware & Pixhawk 4 & Raspberry Pi 3B+ & PC und/oder Smartphone \hfill \\ \hline
+    Software & PX4 & MAVLink-Router% \newline -ROS-Umgebung \newline -Avoidance \newline Hindernisse, Trajektorie, Flugcontroller bedienen, Ultraschallsensoren
+    & QGroundControl \hfill \\
+    \end{tabularx}
+\end{table}
+
+Bestandteil der Drohne sind weitere Komponenten (Sensoren und Aktoren), wovon die meisten im Flugcontroller integriert sind bzw. in engen Zusammenhang mit diesem stehen, wie in Bild \ref{fig:system_physics} dargestellt. Grau hinterlegt sind die Bestandteile aus Tabelle \ref{tab:system_intro}. Im Rahmen dieser Projekte hinzugefügte Sensoren sind grün hinterlegt. Diese werden direkt am Bordcomputer angeschlossen, der mit den gewonnenen Daten Berechnungen zum Flug durchführen soll. Der Bordcomputer erhält kabelgebunden über UART-Verbindung Daten vom Flugcontroller und sendet diese kabellos per WLAN-Verbindung weiter zur Bodenstation (gelb hinterlegt).
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{images/001_vereinfacht-Page-3.drawio.png}
+    % oder mehrere Bilder, dann aber IMMER MIT \hfill !!!!
+    %\subfloat[Bild 1]{\includegraphics[width=0.4\textwidth]{images/sim_initial.png}}\hfill
+    %\subfloat[Bild 2]{\includegraphics[width=0.4\textwidth]{images/sim_initial.png}}\hfill
+    \caption{Beschreibung des Systems Drohne-Bodenstation}
+    \label{fig:system_physics}
+\end{figure}
+
+\section{Beschreibung des Zielsystems}
+Zusätzliche Sensoren stellen Daten für Berechnungen auf dem Bordcomputer bereit. Diese müssen ausgewertet und die Ergebnisse dem Flugcontroller zugespielt werden. Das Auswerten und Zuspielen der Daten ist zeitkritisch denn es beeinflußt direkt den Flug der Drohne. Im Idealfall sollten Berechnungen direkt auf dem Flugcontroller oder in unmittelbarem Zusammenhang mit diesem durchgeführt werden. Zu den Aufgaben zählt:
+\begin{itemize}
+    \item Erfassen von Ultraschall-Daten zum Detektieren von Hindernissen
+    \item Erfassen von Bildern
+    \item Verarbeiten von Bildern zur Erkennung von Hindernissen
+    \item Berechnung alternativer Flugbahn zur Umgehung von Hindernissen
+\end{itemize}
+\paragraph*{Avoidance}\label{chap:avoidance}
+Zur Umsetzung der Flugplanung soll zuerst
+
+\section{Beschreibung der Simulation}\label{chap:intro_simulation}
+Zur Entwicklung wurde ein \gls{hil}-Aufbau aufgesetzt. Bild \ref{fig:system_sim} zeigt, in Anlehnung an Bild Bild \ref{fig:system_physics}, die durch die Simulation übernommenen Funktionen in hell-rot. Die Aufgaben der Komponenten während der Entwicklung sind:
+\paragraph*{}
+\begin{description}
+    \item[Simulation:] In der Simulation werden sowohl alle physikalischen Effekte als auch die virtuelle Umgebung der Drohne berechnet. Die Sensordaten werden der Drohne direkt von der Simulation per USB-Anschluss eingespeist. Eine resultierende Ansteuerung der Motoren wird in die Simulation übernommen. Somit kann sich die Drohne in der Simulation wie in realer Umgebung bewegen. Außerdem werden von der Drohne aufgenommene, simulierte Kamerabilder bereitgestellt.
+    \item[Drohne:] Der Flugcontroller auf der Drohne wird im \gls{hil}-Modus betrieben. Alle Ein- und Ausgänge zum Controller werden durch virtuelle Schnittstellen der Simulation ersetzt. Die Kommunikation mit dem Bordcomputer bleibt dieselbe wie zuvor, sodass die Drohne per Bodenstation gesteuert werden kann.
+    \item[Bordcomputer:] Wird weiterhin nur zur Kommunikation zwischen Bodenstation und Flugcontroller verwendet. Erweiterte Funktionen werden auf einem separaten Rechner entwickelt und getestet.
+\end{description}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\linewidth]{images/001_vereinfacht-Page-5.drawio.png}
+    % oder mehrere Bilder, dann aber IMMER MIT \hfill !!!!
+    %\subfloat[Bild 1]{\includegraphics[width=0.4\textwidth]{images/sim_initial.png}}\hfill
+    %\subfloat[Bild 2]{\includegraphics[width=0.4\textwidth]{images/sim_initial.png}}\hfill
+    \caption{Beschreibung des Systems zur Simulation der Drohne}
+    \label{fig:system_sim}
+\end{figure}
+\paragraph*{}
+Erweiterte Funktionalität wird auf dem Entwicklungsrechner in Containern, in Verbindung mit der Simulation, erprobt. Derartige fertige Anwendungen können dann direkt auf dem Bordcomputer eingesetzt werden. Bestandteile der Software sind:
+\paragraph*{}
+\begin{description}
+    \item[\gls{ros}] 
+    \item[\textit{mavros}:] auf gleicher Ebene angesiedelt wie eine Bodenstation, erlaubt Protokollübersetzung zwischen \gls{mav}- und \acrshort{ros}-Nachrichten für \acrshort{ros}-internen Datenaustausch, empfängt Daten der Drohne und sendet neue Anweisungen zur Drohne
+    \item[Tiefenverarbeitung:] arbeitet direk mit Tiefenbildern aus dem Simulator um eine \enquote{Punktwolke der Umgebung} zu generieren
+    \item[\textit{Avoidance}:] setzt neue Zielpunkte für Drohne anhand von Sensordaten der Drohne und Punktwolke von Kamera
+    \item[\textit{AirSim-Wrapper}:] nicht für Endanwendung benötigt, kommuniziert direkt mit dem Simulationsprogramm und stellt Tiefenbild bereit
+\end{description}
+

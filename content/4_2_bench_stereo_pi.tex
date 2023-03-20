@@ -1,0 +1,28 @@
+\section{Machbarkeitsstudie Stereokamera mit Raspberry Pi}
+Vor der Anschaffung eines Kameramoduls für den Raspberry Pi, soll die Nutzbarkeit bewertet werden.\\
+AC:
+\begin{itemize}
+    \item flüssige Ausgabe von Punktwolke, Avoidance benötigt $10-20$ \gls{fps}
+    \item Erfassung großer Gegenstände, kleine Texturen können je nach Kamera und Lichtverhältnissen nicht erfasst werden
+    \item Erfassung von Gegenständen im Nahbereich vor der Kamera, weitläufiger Hintergrund kann vernachlässigt werden
+\end{itemize}
+
+\acrshort{ros} stellt eine Beispiel-Videoaufnahme mit einer Auflösung von $640x480$ Pixeln und $15$ \gls{fps} Bildwiederholrate bereit, die von 2 Kameras als linke und rechte Perspektive aufgenommen wurde. Diese wird als Referenz für die Tests verwendet.
+
+\paragraph*{Durchführung}
+\acrshort{ros} stellt die notwendige Software zur Verfügung. Mit dem Programm \textit{stereo\_image\_proc} können 2 Bilder (Linkes und Rechtes Bild) zu einem Tiefenbild zusammengeführt werden.
+
+Optimierung steht im Kontext hier für eigene Kompilierung mit den C++-Compiler Flags \texttt{-march=native -O3}. Durch diese wird eine Anpassung auf den aktuell verwendeten Prozessor aktiviert. Speziell die Bildverarbeitung mittels OpenCV kann durch parallele Verarbeitung mit sog. Streaming-Befehlssätzen, ähnlich einer Grafikkarte, beschleunigt werden.  
+\begin{table}[!ht]
+    \label{tab:bench_stereo_image_proc}
+    \caption{Benchmark zum Programm \textit{stereo\_image\_proc} auf dem \gls{rpi}}
+    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X}
+    Versuch &   Auflösung normal (640x480)    &   Auflösung halbiert (320x240)\\
+    \hline
+    Standard Packete    &   6.3 &   14.7\\
+    \hline
+    Optimiertes OpenCV  &   6.9 &   14.7\\
+    \hline
+    Optimiertes OpenCV,\newline vision\_opencv und image\_pipeline & 6.7 & 14.6\\
+    \end{tabularx}
+\end{table}

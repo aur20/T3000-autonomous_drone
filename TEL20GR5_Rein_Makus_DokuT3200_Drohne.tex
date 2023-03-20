@@ -1,0 +1,86 @@
+\documentclass[ a4paper,
+                oneside,
+                toc=bibliography,
+                toc=listof
+                ]{scrbook}
+
+% \usepackage[ngerman, english]{babel} % If the thesis is in English
+\usepackage[english, ngerman]{babel} % If the thesis is in German
+
+\input{packages}
+
+% This class does the ISW styling for you (together with scrbook).
+%
+% It handles the following:
+% - Proper input and font encoding (Just type, don't care about the LaTeX compiler you use or how to type German umlauts)
+% - Fonts with ligatures and kerning (Tex Gyre fonts are used, part of every LaTeX installation, text is nice to read)
+% - Bibliography styling for biblatex (declare your bibliography file and you are ready to go)
+% - Provide command for title page (\makeISWtitle) and declaration of originality ( \declarationOfOriginality)
+% - Loads packages "biblatex" and "graphics"
+\usepackage[
+    type=studie, %master, % bachelor, study, bachelorproject
+]{iswthesis}
+
+%Path to .bib-File(s) for BibLatex
+\addbibresource{bibliography.bib}
+\addbibresource{Studienarbeit_T3200.bib}
+% \addbibresource{someOtherBibFile}
+\input{content/abkuerzungen}
+
+\author{Markus Rein}
+\placeOfBirth{Leipzig}
+\address{Alexanderstraße 146, 70180 Stuttgart}
+\major{Elektrotechnik}
+\title{Erweiterung bestehender Drohnen um eine Autonomflugfähigkeit}
+\titleTranslated{Wie man einen Hamster trainiert}
+\matrnr{6983030, TEL20GR5}
+\date{21.10.22 -- 22.01.2023}
+\supervisor{Prof. Dr.-Ing. Johannes Moosheimer}
+\professor{Prof. Dr.-Ing. Oliver Riedel}
+\usepackage{atbegshi}% http://ctan.org/pkg/atbegshi
+\AtBeginDocument{\AtBeginShipoutNext{\AtBeginShipoutDiscard}} 
+    
+\begin{document}
+    \frontmatter
+    \makeISWtitle
+    
+    \cleardoublepage
+	\setcounter{page}{1} % start at page (i) after title page
+    \declarationOfOriginality
+
+    % Kurzfassung/Abstract
+    
+    \cleardoublepage
+    \tableofcontents
+
+    \mainmatter
+
+    % ********************************************************************
+    % Write your own contents here:
+    % ********************************************************************
+    \input{content/2_intro}
+    \input{content/3_sota}
+    \input{content/4_1_simulations.tex}
+    \input{content/4_2_bench_stereo_pi.tex}
+
+    \appendix
+    \input{content/6_anhang.tex}
+
+    % ********************************************************************
+    % End of contents
+    % ********************************************************************
+
+    \backmatter
+    \cleardoublepage
+    \printbibliography
+
+    \cleardoublepage
+    \listoffigures
+    \cleardoublepage
+    \listoftables
+    \cleardoublepage
+    \printnoidxglossaries
+    % Appendix, if needed:
+
+
+\end{document}
