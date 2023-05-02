@@ -1,0 +1,73 @@
+\chapter{Einführung in Projekt}
+Auf physikalische Zusammenhänge wird in der Arbeit nicht eingegangen, da am bestehenden System Drohne keine Änderungen vorgenommen werden. Es wird lediglich die Software angepasst, was die Flugfähigkeit aber nicht beeinflußt.
+
+\section{Verwendete Technologien}
+\subsection{WLAN}
+\subsection{GPS}
+
+\section{Beschreibung der Drohne in den einzelnen Phasen}
+\subsection{Beschreibung des Ausgangsystems Drohne}
+Die Drohne kann mit Methoden der Regelungstechnik als adaptives System beschrieben werden. Dabei dient der Flugcontroller als Regler, die Motoren als Steuerstrecke, und Bordcomputer sowie Bodenstation zur Identifikation und Modifikation der Parameter. Zu Beginn wird die Drohne in ihrer Ausgangslage, ohne automone Flugfähigkeiten beschrieben. Die Bestandteile des Systems sind zunächst in Tabelle \ref{tab:system_intro} aufgelistet.
+
+\begin{table}[!ht]
+    \caption{Systemübersicht Drohne und Bodenstation}
+    \begin{tabularx}{\textwidth}{l | X | X | X }
+    & \multicolumn{2}{c |}{Drohne} & \\
+    & Flugcontroller & Bordcomputer & Bodenstation \\ \hline
+    Funktion & Autopilot-Software liest Sensoren und steuert Motoren der Drohne & Bereitstellung \acrshort{wlan}-Netzwerk zur Verbindung von Autopilot und Bodenstation & Parametrierung und Steuerung der Drohne\hfill \\ \hline
+    Hardware & Pixhawk 4 & Raspberry Pi 3B+ & PC und/oder Smartphone \hfill \\ \hline
+    Software & PX4 & MAVLink-Router% \newline -ROS-Umgebung \newline -Avoidance \newline Hindernisse, Trajektorie, Flugcontroller bedienen, Ultraschallsensoren
+    & QGroundControl \hfill \\
+    \label{tab:system_intro}
+    \end{tabularx}
+\end{table}
+
+Zusammen bilden sie ein System wie in Bild \ref{fig:system_intro} gezeigt. Im Flugbetrieb werden von der Bodenstation Flugbefehle (feste Zielkoordinaten, relative Koordinaten, oder manuelle Motoransteuerung) per \acrshort{wlan}-Verbindung an den Bordcomputer, von diesem per Serieller Schnittstelle (\acrshort{uart}) an den Flugcontroller, geschickt. Mehr Details zur Steuerung mit der Bodenstation in \cref{chap:intro_capabilities}. Der Flugcontroller steuert anschließend die Motoren um die gewünschte Position zu erreichen. Als Eingabegrößen stehen dem Flugcontroller Sensordaten von Beschleunigungssensor, Kompass (erstere bilden zusammen die \gls{imu}) und Barometer, diese sind im Flugcontroller integriert, und der GPS-Antenne zur Verfügung.
+
+\subsection{Beschreibung des Zielsystem Drohne mit autonomer Flugfähigkeit}
+Zusätzliche Sensoren stellen Daten für Berechnungen auf dem Bordcomputer bereit. Diese müssen ausgewertet und die Ergebnisse dem Flugcontroller zugespielt werden. Das Auswerten und Zuspielen der Daten ist zeitkritisch denn es beeinflußt direkt den Flug der Drohne. Im Idealfall sollten Berechnungen direkt auf dem Flugcontroller oder in unmittelbarem Zusammenhang mit diesem durchgeführt werden. Zu den Aufgaben zählt:
+\begin{itemize}
+    \item Erfassen von Ultraschall-Daten zum Detektieren von Hindernissen
+    \item Erfassen von Bildern
+    \item Verarbeiten von Bildern zur Detektieren von Hindernissen
+    \item Berechnung alternativer Flugbahn zur Umgehung von Hindernissen
+\end{itemize}
+
+Die Umsetzung der Flugplanung soll mittels der Software \textit{Avoidance} erfolgen. Diese arbeitet auf dem Metabetriebssystem \acrshort{ros}, welches wiederum auf \textit{Ubuntu} aufsetzt. (Im Anwendungsfall ROS Noetic auf Ubuntu 20.04.) Die Software kann vollständig auf dem \gls{rpi} betrieben werden. Somit ergeben sich für den \gls{rpi} weitere Aufgabenbereiche, wie nachfolgend dargestellt. Das erweiterte System ist dargestellt in Bild \ref{fig:system_added_sensors}.
+
+\begin{itemize}
+    \item Ubuntu 20.04 als Betriebssystem (nur indirekt möglich innerhalb eines Containers möglich)
+    \item \acrshort{ros}-Noetic innerhalb des Docker-Containers
+    \item Einlesen der Ultraschallsensordaten, erzeugen von Tiefenkarte und publizieren entsprechender Topic
+    \item Einlesen der Kamerabilder, erzeugen von Tiefenkarte und publizieren entsprechender Topic
+    \item Ausführung von Avoidance
+\end{itemize}
+
+\subsection{Beschreibung der Simulation}\label{chap:intro_simulation}
+Die Entwicklung von Software für und im Zusammenhang mit dem Flugcontroller sieht vor, in einer Simulation getestet zu werden. Von der Dronecode-Stiftung wird als offizielle Umgebung dazu der Simulator \textit{Gazebo} empfohlen\cite{dronecodestiftungSimulationPX4User}. Sowohl die \textit{PX4}- als die \textit{Avoidance}-Software können vollständig in diesem betrieben werden. Zum Betrieb des Simulators wird wieder das Betriebssystem Linux Ubuntu benötigt. Deshalb werden für das Projekt einige Einschränkungen aufgenommen. Die weiteren Ausführungen hier beschreiben die Ausgangslage zur Simulation, in \cref{chap:intro_avoidance} wird \acrshort{ros} eingeführt und eingerichtet.
+
+Zum Vorgehen wird der \gls{hil}-Aufbau mit dem Simulator \textit{AirSim} von Microsoft\cite{microsoftcorporationWelcomeAirSim2023}, wie in \cite[Kapitel 3.4.1]{markusreinErweiterungBestehenderDrohnen2023} beschrieben, verwendet. Bild \ref{fig:system_sim} zeigt, in Anlehnung an Bild \ref{fig:system_intro}, die durch die Simulation übernommenen Funktionen. Die Komponenten sind im Betrieb wie folgt verbunden:
+\begin{description}
+    \item[PC-Flugcontroller:] \acrshort{usb}-Kabel, wird von \textit{AirSim} zur direkten Kommunikation mit dem Flugcontroller verwendet
+    \item[PC-Bordcomputer:] \acrshort{wlan}, erlaubt Verbindung Bodenstation mit Flugcontroller
+\end{description}
+
+Die Aufgaben der Komponenten während der Entwicklung sind:
+\begin{description}
+    \item[Simulation:] In der Simulation werden sowohl alle physikalischen Effekte berechnet als auch die virtuelle Umgebung der Drohne dargestellt. Die Sensordaten werden der Drohne direkt von der Simulation eingespeist. Eine resultierende Ansteuerung der Motoren wird in die Simulation übernommen. Somit kann sich die Drohne in der Simulation wie in realer Umgebung bewegen. Außerdem werden von der Drohne aufgenommene, simulierte Kamerabilder bereitgestellt.
+    \item[Drohne:] Der Flugcontroller auf der Drohne wird im \gls{hil}-Modus betrieben. Alle Ein- und Ausgänge zum Controller werden durch virtuelle Schnittstellen der Simulation ersetzt. Die Kommunikation mit dem Bordcomputer bleibt dieselbe wie zuvor, sodass die Drohne per Bodenstation gesteuert werden kann.
+    \item[Bordcomputer:] Wird weiterhin nur zur Kommunikation zwischen Bodenstation und Flugcontroller verwendet. Erweiterte Funktionen werden auf einem separaten Rechner entwickelt und getestet um anschließend auf den Bordcomputer überspielt zu werden.
+\end{description}
+
+%\paragraph*{}
+%Erweiterte Funktionalität wird auf dem Entwicklungsrechner in Containern, in Verbindung mit der Simulation, erprobt. Derartige fertige Anwendungen können dann direkt auf dem Bordcomputer eingesetzt werden. Bestandteile der Software sind:
+%\paragraph*{}
+%\begin{description}
+%    \item[\gls{ros}] 
+%    \item[\textit{mavros}:] auf gleicher Ebene angesiedelt wie eine Bodenstation, erlaubt Protokollübersetzung zwischen \gls{mav}- und \acrshort{ros}-Nachrichten für \acrshort{ros}-internen Datenaustausch, empfängt Daten der Drohne und sendet neue Anweisungen zur Drohne
+%    \item[Tiefenverarbeitung:] arbeitet direk mit Tiefenbildern aus dem Simulator um eine \enquote{Punktwolke der Umgebung} zu generieren
+%    \item[\textit{Avoidance}:] setzt neue Zielpunkte für Drohne anhand von Sensordaten der Drohne und Punktwolke von Kamera
+%    \item[\textit{AirSim-Wrapper}:] nicht für Endanwendung benötigt, kommuniziert direkt mit dem Simulationsprogramm und stellt Tiefenbild bereit
+%\end{description}
+%
+%

@@ -1,0 +1,52 @@
+\chapter{Einleitung}
+Dieses Projekt dient der Verwirklichung Autonomen Fliegens.
+
+\textbf{Ziele der Arbeit:}
+\begin{itemize}
+    \item Erweiterung der Sensorfähigkeit der Drohne um Tiefenkamera
+    \item Verwendung von Tiefenbildern und Ultraschallsensordaten für Hinderniserkennung 
+    \item Autonomer Flug der Drohne um große, flächige Hindernisse wie Häuser oder Automobile unter Verwendung der Software \textit{Avoidance}
+\end{itemize}
+
+\textbf{Optionale Erweiterungen:}
+\begin{itemize}
+    \item Verfeinerungen und Anpassungen der Software \textit{Avoidance}, sodass kleinere, strukturreiche Hindernisse (bspw. Bäume) erkannt und umflogen werden
+    \item Einführung kamerabasierte Zielerkennung als Alternative zur GPS-gestützten Zielführung
+\end{itemize}
+
+\textbf{Geplantes Vorgehen:}
+\begin{enumerate}
+    \item Vervollständigen der Simulation aus vorhergehendem Projektteil: die simulierte Drohne soll im Flug allein mit Kamerabildern und der Software \textit{Avoidance} Hindernissen ausweichen 
+    \item Beschaffung und Installation Tiefenkamera an realer Drohne
+    \item Aufspielen der Software \textit{Avoidance} auf reale Drohne
+    \item Flugtests mit Tiefenkamera
+    \item Einbinden von Ultraschallsensordaten in Softwareverarbeitung von \textit{Avoidance}
+    \item Flugtests mit Tiefenkamera und Ultraschallsensordaten
+    \item mehr Details: was funktioniert in der Endanwendung, was sind die Schritte in der Simulation, ,was wird simuliert
+\end{enumerate}
+
+Im weiteren Verlauf der Arbeit spielen folgende Begriffe eine wichtige Rolle:\\
+\begin{minipage}[t]{\linewidth}
+\begin{description}
+    \item[Bodenstation:] 
+    \item[\gls{imu}:] Zusammenfassung der Sensorn Beschleunigungssensor, Kompass und Gyroskop
+    \item[\gls{rpi}:] Einplatinencomputer, eingesetzt als Bordcomputer
+    \item[\gls{ros}:] Metabetriebssystem zur Vernetzung von Roboterbestandteilen (Aktor-Sensor-Verknüpfung), Überwachung und Steuerung von Prozessen
+    \item[Docker:] Containerisierung von Betriebssystemumgebungen. Beispielsituation:
+    \begin{itemize}
+        \item auf dem \gls{rpi} läuft Raspberry Pi OS (Linux Debian), genannt Host-Betriebssystem
+        \item unabhängig davon kann innerhalb eines Containers Linux Ubuntu installiert werden
+        \item im Container sind speziell festgelegte Bibliotheken, Umgebungsvariablen, Speichergeräte und Netzwerke zum Programmbetrieb vorhanden, es können Programme gestartet werden, die nicht auf dem Host-Betriebssystem lauffähig sind
+        \item im Container gestartete Programme laufen parallel zu Programmen auf dem Host-Betriebssystem, sie sind trotzdem im Prozessmanager (\textit{top}) von Raspberry Pi OS sichtbar
+    \end{itemize}  
+    \item[PX4:] Offizielle Software der Dronecode Stiftung mit der verschiedene $\mu C$, embedded System, oder PC zum Steuern von Robotern, Fahrzeugen oder Drohnen ausgestattet werden können
+    \item[Avoidance:] Projekt im Umfeld von PX4 zur autonomen Steuerung von Drohnen in unbekanntem Umfeld. Aufgeteilt in 3 Unterprojekte:
+    \begin{itemize}
+        \item Local Planner
+        \item Global Planner
+        \item Safe Landing Planner  
+    \end{itemize}
+    Im derzeitigen Projekt wird der Local Planner umgesetzt.
+    \item[...]
+\end{description}
+\end{minipage}

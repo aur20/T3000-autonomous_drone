@@ -1,0 +1,62 @@
+\chapter{Stand der Technik}
+In diesem Kapitel werden die Grundlagen verwendeter Software erläutert.
+\section{Erweiterte Flugmodi der Drohne}\label{chap:intro_capabilities}
+Bei Verwendung der Drohne in Verbindung mit einer Bodenstation, wird die aktuelle Position auf einer Karte eingezeichnet. Von diesem Punkt aus kann der Drohne eine Wegvorgabe eingespielt werden, der \enquote{Mission-Mode}. Dabei enthält die Karte Informationen zur ungefähren Beschaffenheit der Umgebung, sodass die Drohne nicht Tiefer fliegen würde als der Boden der Karte. Gleichzeitig sind die standardmäßigen Sicherheitsmaßnahmen eingestellt, bspw. eine Mindesflughöhe von $4m$ einzuhalten. Neben der Wegvorgabe können dem Flugcontroller weiterhin verbotene Zonen mitgeteilt werden, die nicht durchflogen werden dürfen, genannt \textit{\enquote{Geo-Fence}}. Der Algorithmus sieht derartige Zonen als Hindernis an. Bei Kontakt mit ihnen wird ein Failsafe ausgelöst. \textit{PX4} kennt zwei derartige Modi:
+\begin{description}
+    \item[Failsafe GeoFence:] Ein Zylinder dessen Durchmesser von der Funkreichweite der Fernbedienung und maximaler Flughöhe beschränkt ist. Bei Durchbruch verfällt die Drohne standardmäßig in den \enquote{Return-Mode} und kehrt zu ihrer Ausgangsposition zurück.
+    \item[GeoFence Plan:] Kreise oder Polygone auf Karte die nicht durchflogen oder verlassen werden dürfen (je nach Einstellung). Bei Bruch der Bedingung verfällt die Drohne in den \enquote{Hold-Mode} und bleibt schlicht stehen.
+\end{description}
+
+Es ist also bereits mit Bordmitteln möglich das Flugverhalten zu beeinflussen. Für das Vorgehen mit \textit{Avoidance} kommt der \enquote{Offboard-Mode} zum Einsatz. In diesem Modus werden dem Flugcontroller ständig neue Anweisungen, als nächster Wegpunkt, eingespeist.
+
+Weiterhin können der Drohne im Missionsmodus sogennante \gls{roi} mitgeteilt werden. Ist eine Kamera an der Drohne vorhanden, wird diese gezielt auf die Positionen gerichtet. Ist keine Kamera explizit definiert richtet sich die Drohne mit dem Bug in Richtung der \gls{roi} aus. Da die Drohne sowohl vorwärts als auch seitwärts fliegen kann, hält sie durchgehend auf den Punkt zu.
+
+\section{ROS und Avoidance}
+Das Projekt \enquote{Obstacle Detection and Avoidance}\cite{dronecodestiftungObstacleDetectionAvoidance2023}, auf GitHub verfügbar als PX4-Avoidance\footnote{\label{note1}\url{https://github.com/PX4/PX4-Avoidance}}, hier nur \textit{Avoidance} genannt, entstand in enger Zusammenarbeit mit der Dronecode Stiftung an der ETH Zürich, dem Ursprungsort aller \textit{PX4}-Software. Es arbeitet innerhalb einer \acrshort{ros}-Umgebung.
+
+Es stehen im Projekt 3 Algorithmen zur Verfügung, die unabhängig voneinander zu betrachten sind. Alle dienen der Anpassung der Flugbahn in unbekannter Umgebung:
+\begin{description}
+    \item[Local Planner:] Navigiert um Hindernisse in der direkten Umgebung
+    \item[Global Planner:] Speichert nahezu vollständige Karte der Umgebung und erlaubt Navigation durch Labyrinth-artige Umgebung
+    \item[Safe Landing Planner:]
+\end{description}
+
+Die Software von \textit{Avoidance} erhält die Daten des Flugcontrollers über das Zwischenprogramm \textit{mavros} (\acrshort{mav}-zu-\acrshort{ros}-Übersetzung, siehe \cite[Kapitel 5.2/5.4]{markusreinErweiterungBestehenderDrohnen2023}). Es sind die Soll-Trajektorie und Sensordaten vom Flugcontroller bekannt. Außerdem wird zur Navigation eine \textit{Punktwolke} (siehe \cref*{chap:intro_pointcloud}) der Umgebung eingespeist. Falls das Programm ein Hindernis in der Flugbahn erkennt, wird eine angepasste Trajektorie an den Flugcontroller ausgegeben.
+
+Die Software kann nicht direkt auf dem Flugcontroller ausgeführt werden, da die Berechnungen sehr viele Ressourcen (Rechenkapazität, Speicher) benötigen. Weiterhin empfehlen die Entwickler, zuerst den Local Planner zu implementieren, da dieser am besten funktioniert. Offizielle Empfehlungen der Entwickler verwenden leisstungsstarke Hardware wie Nvidia Jetson (Hardware-Unterstützung für Bildverarbeitung) oder Intel RealSense (Kamera mit Tiefenerkennung).
+
+Im Zusammenhang mit der Software sind letztere bereits erprobt. Aufgrund des hohen Preises können sie nicht in diesem Projekt verwendet werden, siehe \cite[Kapitel 4.3.8]{wirthErweiterungBestehendenDrohne2022}. Als Alternative können auch Stereokameras verwendet werden. Beispielcode zur Einbindung von Tiefenbildern ist unter Github (siehe \cref{note1}) vorhanden. 
+
+%Stereokamera liefert genaue Karte der Umgebung, ähnlich einem Lidar.
+%Andere Methoden arbeiten eventuell nicht mit Avoidance zusammen. Doch doch
+
+\section{Hinderniserkennung und ROS Punktwolken}\label{chap:intro_pointcloud}
+Als Verschiedene Prinzipien stehen zur Hinderniserkennung zur Verfügung. Als Eingabegröße für \textit{Avoidance} müssen die verarbeiteten Bilder im Punktwolkenformat als \acrshort{ros}-Topic vorliegen.
+%Quellen nicht eindeutig
+%Der Fokus dieses Projektes, das Erkennen und Ausweichen von Hindernissen wird \enquote{Obstacle Avoidance} genannt. Es ist nicht zu verwechseln mit \enquote{Obstacle Detection}, dem Erkennen und Klassifizieren von Bildinhalten.
+Nachfolgend vorgestellt werden die grundlegenden Techniken der Bilderkennung. 
+\subsection{SLAM Algorithmus}\label{chap:slam}
+\Gls{slam} Techniken entstanden bereits in den 1980-1990 Jahren und werden bspw. bei Robotern eingesetzt, die in Hallen navigieren (für die kein \acrshort{gps} verfügbar ist). Zum Einsatz kommen Kamerasysteme in Verbindung mit Entfernungssensoren (Sonar, Radar, Lidar). Die Ergebnisse von \gls{slam} können nicht garantiert werden und sind nicht reproduzierbar, weshalb es in keinen kritischen Umgebungen (bspw. wenn Verletzungsrisiko besteht) eingesetzt werden kann.
+
+Allgemein wird \gls{slam} durch einen modularen Prozess beschrieben:
+\begin{description}
+    \item[Lokalisierung:] per Motorfortschritt, \gls{imu}, Kamera, etc.%\newline Bei v\gls{slam} kommen folgende Prinzipien zum Einsatz:
+    \item[Kartengenerierung:] durch einen der Algorithmen
+\begin{itemize}
+    \item Markov-Lokalisierung: Wahrscheinlichkeit des Aufenthaltsortes wird angenommen und über Zeit verfeinert; Iterativ; Ressourcenaufwendig
+	\item Kalman-Filter: Ermöglicht basierend auf Sensordaten schnelles wiederfinden aktueller Position; anfällig bei Verlust von Eingangsdaten
+	\item Monte-Carlo-Lokalisierung (Partikelfilter): nimmt Wahrscheinlichkeiten für jeden Ort an; genauer als Markov-Filter; lineare Komplexität; Weniger Speicher als Kalman-Filter; Nachteil: Stillstand ohne sich ändernde Sensordaten
+\end{itemize}
+    \item[Messung:] per Reichweite, Marker in Umgebung
+\end{description}
+%was sollte hier noch hin
+
+\paragraph*{Visual SLAM,}kurz vSLAM, stellt eine Unterform des \gls{slam} dar, bei der ausschließlich Kameras zur Erfassung der Umgebung eingesetzt werden. Algorithmen verwenden zumeist zusätzlich die Daten der \acrshort{imu}, um die Bewegung der Kamera in die Berechnung der Position einzubeziehen.
+
+\subsection{Stereokamera}\label{chap:stereovision}
+Verwendet mehrere Kameras aus parallelverschobenen Bildern Tiefeninformationen zu gewinnen. also Abstand zu Punkten im Bild zu erkennen.
+\subsection{Optical Flow}
+In Bewegungsabläufen werden Objekten verfolgt und können somit relativ zur Kamera bestimmt werden. Das Prinzip wird auch von Lebewesen im Gehirn angewandt. Dabei kann schlecht zwischen der Bewegung der Kamera und der Bewegung von Objekten unterschieden werden. Ungenau, da Kameras immer eine Verzerrung besitzen. 
+
+\subsection{Punktwolkenformat}
+Die Möglichkeiten Optical Flow und Stereokamera erzeugen jeweils Tiefenkarten. In diesen Bildern sind, zumeist als Graustufen, Pixel je nach Entfernung zur Kamera gekennzeichnet. Zur Umwandlung als Punktwolke muss jedes Pixel abgetastet werden um als Koordinate im 3D-Raum dargestellt werden zu können. Das \acrshort{ros} beinhaltet sowohl Progamme zur Stereoverarbeitung basierend auf OpenGL\footnote{siehe \url{http://wiki.ros.org/stereo_image_proc}}, als auch die Erzeugung von Punktwolken\footnote{siehe \url{http://wiki.ros.org/depth_image_proc}}.
