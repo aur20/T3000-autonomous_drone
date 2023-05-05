@@ -1,12 +1,14 @@
 # Arduino reading ultrasonic sensor and filtering data
 
-Small side project. Reads 4 sensors, makes Arduino an I2C slave, sends data to RPI when requested.
+Small side project. Reads 4 sensors, makes Arduino an I2C slave, RPI requests data from Arduino.
 
-Using:
+Part list:
 
-* Arduino Nano
-* 4 * [Ultrasonic Ranging Module HC - SR04](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
-* RPI reading data via I2C via Python
+ * Arduino Nano
+ * 4 * [Ultrasonic Ranging Module HC - SR04](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
+ * RPI reading data via I2C via Python
+ * Jumper cables -> wire up as described in the top lines of Arduino script
+ * **No additional resistor required**
 
 ## Usage
 
@@ -23,13 +25,12 @@ Install packages at RPI:
 pip install smbus2
 ```
 
-Run the scripts:
+## Run the scripts:
 
-```
-python ultrasonic_i2c_reader.py
-```
-
-Press either ```a``` to get all sensor data or type ```1``` to ```4``` get data from one sensor.
+```python ultrasonic_i2c_reader.py```:
+ * Press ```t``` to set current ambient temperature (default is 20 degree Celsius). Next you are prompted to enter a new value.
+ * Press either ```a``` to get all sensor data or type ```1``` to ```4``` get data from one sensor.
+ * Press ```r``` to get all raw unfiltered sensor data.
 
 Or use ```ultrasonic_i2c_csvwriter.py``` to constantly monitor data and create a table (which can be fed i.e. to Matlab).
 

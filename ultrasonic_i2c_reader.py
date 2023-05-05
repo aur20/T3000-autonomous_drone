@@ -9,17 +9,25 @@
 from smbus2 import SMBus
 import struct
 
-addr = 0x8 # bus address
+addr = 0x8 # bus address of target device
 bus = SMBus(1) # indicates /dev/ic2-1
 
-numb = 1
-
-print ("Enter 1..4 or a to get corresponding sensor")
+print ("Enter '1..4' or 'a' to get corresponding sensor. 't' to set temperature. 'r' to get raw unfiltered data. Anything else to exit.")
 while True:
 	action = input(">>>>   ")
 	if action == "a":
 		c = 0
 		req = bus.read_i2c_block_data(addr, ord('a'), 16) # get all sensors
+	elif action == "r":
+		c = 5
+		req = bus.read_i2c_block_data(addr, ord('r'), 16) # get all sensors raw data
+	elif action == "t":
+		# FEATURE NOT IMPLEMENTED YET
+		# Set environmental temperature - used for speed of sound calculation
+		temp = input("Enter a value for environmental temperature:")
+		data = bytearray(struct.pack("f", float(temp)))
+		req = bus.write_i2c_block_data(addr, ord('t'), data) # get first sensor
+		continue
 	elif action == "1":
 		c = 0
 		req = bus.read_i2c_block_data(addr, 1, 4) # get first sensor
@@ -32,12 +40,15 @@ while True:
 	elif action == "4":
 		c = 3
 		req = bus.read_i2c_block_data(addr, 4, 4) # get fourth sensor
-
 	else:
 		break
 
 	#print("Length of received data: %s Type: %s Data: %s" % (len(req), type(req), req))
-	r = struct.iter_unpack('<f', bytearray(req))
+	if c == 5:
+		r = struct.iter_unpack('<L', bytearray(req))
+		c = 0
+	else:
+		r = struct.iter_unpack('<f', bytearray(req))
 
 	for i in r:
 		c = c + 1;
