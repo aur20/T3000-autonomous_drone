@@ -14,17 +14,17 @@
 
 /* Program defitions
  *******************/
-#define num_sensors 4               // # of sensors
-#define pause_meas 60               // measurement cycle [ms]
-#define min_deviation 0.02          // * 100%: values less than this are ignored
-#define max_deviation 0.05          // * 100%: values greater than this are filtered 
-#define filter_array_shift 2        // edit here to adjust filter_array_size
-#define filter_array_size (1<<filter_array_shift) // make size to the power of 2 for better performance
+#define NUM_SENSORS 4               // # of sensors
+#define PAUSE_MEAS 60               // measurement cycle [ms]
+#define MIN_DEVIATION 0.02          // * 100%: values less than this are ignored
+#define MAX_DEVIATION 0.05          // * 100%: values greater than this are filtered 
+#define FILTER_ARRAY_SHIFT 2        // edit here to adjust FILTER_ARRAY_SIZE
+#define FILTER_ARRAY_SIZE (1<<FILTER_ARRAY_SHIFT) // make size to the power of 2 for better performance
 
-#define cm_per_usecond (0.034 / 2)  // v=s/t <-> t=s/v
-#define t_echo_min (2 / cm_per_usecond)
-#define t_echo_max (380 / cm_per_usecond)
-#define t_echo_outofrange (400 / cm_per_usecond)
+#define CM_PER_SECOND (0.034 / 2)  // v=s/t <-> t=s/v
+#define T_ECHO_MIN (2 / CM_PER_SECOND)
+#define T_ECHO_MAX (380 / CM_PER_SECOND)
+#define T_ECHO_OUT_OF_RANGE (400 / CM_PER_SECOND)
 unsigned long measure_distance(uint8_t triggerPin, uint8_t echoPin){
   // generate 10-microsecond pulse to TRIG pin
   digitalWrite(triggerPin, HIGH);
@@ -33,81 +33,81 @@ unsigned long measure_distance(uint8_t triggerPin, uint8_t echoPin){
   
   // measure duration of pulse from ECHO pin
   // pulseIn: The length of the pulse (in microseconds) or 0 if no pulse started before the timeout.
-  unsigned long duration = pulseIn(echoPin, HIGH, t_echo_max);
-  if(duration < t_echo_min) // includes duration == 0
-    return t_echo_outofrange;
+  unsigned long duration = pulseIn(echoPin, HIGH, T_ECHO_MAX);
+  if(duration < T_ECHO_MIN) // includes duration == 0
+    return T_ECHO_OUT_OF_RANGE;
   return duration;
 }
 
 float filter_median(unsigned short _i, unsigned long t){
-  static unsigned long filter_array[num_sensors << filter_array_shift] = { 0 };
-  static unsigned short i[num_sensors] = { 0 };             // index for each sensor
+  static unsigned long filter_array[NUM_SENSORS << FILTER_ARRAY_SHIFT] = { 0 };
+  static unsigned short i[NUM_SENSORS] = { 0 };             // index for each sensor
   
-  unsigned long *arr = filter_array + (_i << filter_array_shift);
+  unsigned long *arr = filter_array + (_i << FILTER_ARRAY_SHIFT);
   unsigned short *index = i + _i;
   unsigned long old_t = arr[*index];
   float d = abs( ((float)t) / ((float)old_t) - 1);
-  *index = (*index + 1) % filter_array_size;
-  if(d < min_deviation){ //ignore
+  *index = (*index + 1) % FILTER_ARRAY_SIZE;
+  if(d < MIN_DEVIATION){ //ignore
     arr[*index] = old_t;
     t = old_t;
   }
-  else if(d > max_deviation){ //return average of last values
+  else if(d > MAX_DEVIATION){ //return average of last values
     arr[*index] = t;
     unsigned long mean = 0;
-    for(int i = 0; i < filter_array_size; i++)
+    for(int i = 0; i < FILTER_ARRAY_SIZE; i++)
       mean += arr[i];
-    t = mean >> filter_array_shift;
+    t = mean >> FILTER_ARRAY_SHIFT;
   } 
   else { // return this value
     arr[*index] = t;
   }
-  return (float(t)) * cm_per_usecond;
+  return (float(t)) * CM_PER_SECOND;
 }
 
 /* alternative method, not that good
 float filter_moving_average (unsigned short _i, unsigned long t){
-  static unsigned long filter_array[num_sensors << filter_array_shift] = { 0 };
-  static unsigned short i[num_sensors] = { 0 };             // index for each sensor
-  static unsigned long averages[num_sensors] = { 0 };       // average for each sensor
+  static unsigned long filter_array[NUM_SENSORS << FILTER_ARRAY_SHIFT] = { 0 };
+  static unsigned short i[NUM_SENSORS] = { 0 };             // index for each sensor
+  static unsigned long averages[NUM_SENSORS] = { 0 };       // average for each sensor
 
-  unsigned long *arr = filter_array + (_i << filter_array_shift);
+  unsigned long *arr = filter_array + (_i << FILTER_ARRAY_SHIFT);
   unsigned short *index = i + _i;
   unsigned long *mean = averages + _i;
   
   *mean = *mean - arr[*index] + t; // replace oldest entry by newest
   arr[*index] = t;
-  *index = (*index + 1) % filter_array_size;
+  *index = (*index + 1) % FILTER_ARRAY_SIZE;
 
-  return ((float)((*mean) >> filter_array_shift)) * cm_per_usecond;
+  return ((float)((*mean) >> FILTER_ARRAY_SHIFT)) * CM_PER_SECOND;
 }*/
 
 /* alternative method, not that good
 float filter_median2(unsigned short _i, unsigned long t){
-  static unsigned long filter_array[num_sensors << filter_array_shift] = { 0 };
-  static unsigned short i[num_sensors] = { 0 };             // index for each sensor
+  static unsigned long filter_array[NUM_SENSORS << FILTER_ARRAY_SHIFT] = { 0 };
+  static unsigned short i[NUM_SENSORS] = { 0 };             // index for each sensor
   
-  unsigned long *arr = filter_array + (_i << filter_array_shift);
+  unsigned long *arr = filter_array + (_i << FILTER_ARRAY_SHIFT);
   unsigned short *index = i + _i;
   unsigned long old_t = arr[*index];
   float d = abs( ((float)t) / ((float)old_t) - 1);
-  *index = (*index + 1) % filter_array_size;
-  if(d < min_deviation){ //ignore
+  *index = (*index + 1) % FILTER_ARRAY_SIZE;
+  if(d < MIN_DEVIATION){ //ignore
     arr[*index] = old_t;
     t = old_t;
   }
-  else if(d > max_deviation){ //return average of last values
+  else if(d > MAX_DEVIATION){ //return average of last values
     unsigned long mean = 0;
-    for(int i = 0; i < filter_array_size; i++)
+    for(int i = 0; i < FILTER_ARRAY_SIZE; i++)
       mean += arr[i];
     mean = mean - old_t + t;
-    t = mean >> filter_array_shift;
+    t = mean >> FILTER_ARRAY_SHIFT;
     arr[*index] = t;
   } 
   else { // return this value
     arr[*index] = t;
   }
-  return (float(t)) * cm_per_usecond;
+  return (float(t)) * CM_PER_SECOND;
 }*/
 
 /* I2C Definitions
@@ -181,25 +181,25 @@ void loop()
   d = filter_median(0, t);
   *(i2cResponseRaw) = t
   *(float*)(i2cResponseBuffer) = d;
-  delay(pause_meas -  (t >> 10));
+  delay(PAUSE_MEAS - (t >> 10));
 
   t = measure_distance(B_TRIGGER, B_ECHO);
   d = filter_median(1, t);
   *(i2cResponseRaw + 4) = t
   *(float*)(i2cResponseBuffer + 4) = d;
-  delay(pause_meas -  (t >> 10));
+  delay(PAUSE_MEAS - (t >> 10));
 
   t = measure_distance(C_TRIGGER, C_ECHO);
   d = filter_median(2, t);  
   *(i2cResponseRaw + 8) = t
   *(float*)(i2cResponseBuffer + 8) = d;
-  delay(pause_meas -  (t >> 10));
+  delay(PAUSE_MEAS - (t >> 10));
 
   t = measure_distance(D_TRIGGER, D_ECHO); 
   d = filter_median(3, t);
   *(i2cResponseRaw + 12) = t
   *(float*)(i2cResponseBuffer + 12) = d;
-  delay(pause_meas -  (t >> 10));
+  delay(PAUSE_MEAS - (t >> 10));
 }
 
 // function that executes whenever data is requested by master
