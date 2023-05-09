@@ -38,3 +38,9 @@ source ~/catkin_ws/devel/setup.bash
 rosrun rpi_ros_ultrasonic sensor_interface.py
 ```
 
+## Adjust sensor orientation and offset
+
+After conecting ultrasonic sensors, you must adjust these values according to your setup:
+
+ * Orientations facing in: 1/2 - forward/backward, 3/4 - left/right, 5/6 - top/down
+ * Offsets: Distance from frame center in $cm$. For simplicity, only one dimension of offset is supported.
