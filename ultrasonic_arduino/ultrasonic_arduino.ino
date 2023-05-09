@@ -182,31 +182,43 @@ void setup() {
 
 void loop()
 {
-  unsigned long t;
+  unsigned long t, t2;
   float d;
+  t2 = millis();
   t = measure_distance(A_TRIGGER, A_ECHO);
   d = filter_median(0, t);
   *(i2cResponseRaw) = t;
   *(float*)(i2cResponseBuffer) = d;
-  delay(PAUSE_MEAS - (t >> 10));
+  t2 = millis() - t2;
+  if(t2 < PAUSE_MEAS)
+    delay(PAUSE_MEAS - t2);
 
+  t2 = millis();
   t = measure_distance(B_TRIGGER, B_ECHO);
   d = filter_median(1, t);
   *(i2cResponseRaw + 4) = t;
   *(float*)(i2cResponseBuffer + 4) = d;
-  delay(PAUSE_MEAS - (t >> 10));
+  t2 = millis() - t2;
+  if(t2 < PAUSE_MEAS)
+    delay(PAUSE_MEAS - t2);
 
+  t2 = millis();
   t = measure_distance(C_TRIGGER, C_ECHO);
   d = filter_median(2, t);  
   *(i2cResponseRaw + 8) = t;
   *(float*)(i2cResponseBuffer + 8) = d;
-  delay(PAUSE_MEAS - (t >> 10));
+  t2 = millis() - t2;
+  if(t2 < PAUSE_MEAS)
+    delay(PAUSE_MEAS - t2);
 
+  t2 = millis();
   t = measure_distance(D_TRIGGER, D_ECHO); 
   d = filter_median(3, t);
   *(i2cResponseRaw + 12) = t;
   *(float*)(i2cResponseBuffer + 12) = d;
-  delay(PAUSE_MEAS - (t >> 10));
+  t2 = millis() - t2;
+  if(t2 < PAUSE_MEAS)
+    delay(PAUSE_MEAS - t2);
 }
 
 // function that executes whenever data is requested by master
