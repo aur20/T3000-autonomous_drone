@@ -12,11 +12,6 @@
 %%%
 % Abkürzungsverzeichnis
 \usepackage{scrwfile} % Wichtig, ansonsten erscheint "No room for a new \write"
-% siehe http://www.dickimaw-books.com/cgi-bin/faq.cgi?action=view&categorylabel=glossaries#glsnewwriteexceeded
-\usepackage[acronym,indexonlyfirst,nomain]{glossaries}
-\renewcommand*{\acronymname}{Abkürzungsverzeichnis}
-\renewcommand*{\glsgroupskip}{}
-\makenoidxglossaries
 
 % von https://tex.stackexchange.com/questions/73160/table-with-tabularx-and-multirow
 \usepackage{graphicx}
@@ -36,12 +31,28 @@
 %
 %\ifdeutsch
 \usepackage[ngerman]{hyperref}
+
+% siehe http://www.dickimaw-books.com/cgi-bin/faq.cgi?action=view&categorylabel=glossaries#glsnewwriteexceeded
+\usepackage[acronym,indexonlyfirst,nomain]{glossaries}
+\renewcommand*{\acronymname}{Abkürzungsverzeichnis}
+\renewcommand*{\glsgroupskip}{}
+\makenoidxglossaries
+
 \usepackage[ngerman,capitalise,nameinlink,noabbrev]{cleveref}
 \crefname{section}{Kapitel}{Kapitel}
 %\else
 %\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
 %\fi
 
+\usepackage[chapter]{minted}
+\newmintedfile[pycode]{python}{linenos,breaklines,
+               numbersep=5pt,
+               frame=lines,
+               framesep=2mm}
+\newmintedfile[cccode]{cpp}{linenos,breaklines,
+               numbersep=5pt,
+               frame=lines,
+               framesep=2mm}
 
 % Eigene Farbdefinitionen ohne die Namen des xcolor packages
 \definecolor{darkblue}{rgb}{0,0,.5}
