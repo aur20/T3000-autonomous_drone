@@ -8,7 +8,7 @@
             "PX4": {
                 "VehicleType": "PX4Multirotor",
                 "UseSerial": true,
-		            "UseTCP": false,
+		"UseTCP": false,
                 "LockStep": true,
                 "Sensors":{
                     "Barometer":{
@@ -29,7 +29,7 @@
                       "CaptureSettings": [
                         {
                           "PublishToRos": 1,
-                          "ImageType": 2,
+                          "ImageType": 1,
                           "Width": 256,
                           "Height": 144,
                           "FOV_Degrees": 90,

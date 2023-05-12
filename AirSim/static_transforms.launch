@@ -1,4 +1,0 @@
-<launch>
-	<node pkg="tf" type="static_transform_publisher" name="ned_to_enu_pub" args="0 0 0 1.57 0 3.14 world_ned world_enu 100"/>
-	<node pkg="tf" type="static_transform_publisher" name="ned_to_mk1_pub" args="0.5 0 0.1 0 0 0 PX4 mk1_optical 100"/>
-</launch>

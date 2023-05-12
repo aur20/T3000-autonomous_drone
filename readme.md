@@ -1,3 +1,3 @@
 # Airsim Avoidance
 
-Setup AirSim Simulator using ```settings.json```. Then start Docker. Reuse ```mavros``` from former branch. Then start this branch. RVIZ can visualize pointcloud, Avoidance is not yet working.
+Start AirSim Simulator using `settings.json`. Then start Docker via `docker-compose up`. RVIZ can visualize pointcloud, Avoidance is not yet working.
