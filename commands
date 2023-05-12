@@ -17,4 +17,7 @@ docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && source ~/c
 # to use custom stereo_image_proc with image_resize
 docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && source ~/catkin_ws/devel/setup.bash && ROS_NAMESPACE=narrow_stereo_textured/rs rosrun stereo_image_proc stereo_image_proc"
 
-
+# to adjust stereo_image_proc parameters
+rosrun dynamic_reconfigure dynparam set /narrow_stereo_textured/stereo_image_proc " {'fullDP': False, 'stereo_algorithm': 0, 'prefilter_size': 23, 'prefilter_cap': 20, 'correlation_window_size': 17, 'min_disparity': 0, 'disparity_range': 128, 'texture_threshold': 10, 'speckle_size': 100, 'speckle_range': 10, 'disp12MaxDiff': 0, 'uniqueness_ratio': 8.0, 'P1': 200.0, 'P2': 400.0}"
+# to adjust stereo_image_proc parameters with image_resize
+rosrun dynamic_reconfigure dynparam set /narrow_stereo_textured/rs/stereo_image_proc " {'fullDP': False, 'stereo_algorithm': 0, 'prefilter_size': 23, 'prefilter_cap': 20, 'correlation_window_size': 17, 'min_disparity': 0, 'disparity_range': 128, 'texture_threshold': 10, 'speckle_size': 100, 'speckle_range': 10, 'disp12MaxDiff': 0, 'uniqueness_ratio': 8.0, 'P1': 200.0, 'P2': 400.0}"
