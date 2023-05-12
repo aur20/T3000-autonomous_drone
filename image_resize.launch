@@ -1,0 +1,41 @@
+<launch>
+  <arg name="manager" default="rs_manager" /> <!-- Must be globally qualified -->
+  <arg name="respawn" default="false" />
+  <arg name="left" default="left" />
+  <arg name="right" default="right" />
+  <arg name="rs_prefix" default="rs" />
+  <arg name="scale_width" default="0.5" />
+  <arg name="scale_height" default="0.5" />
+  <arg name="approximate_sync" default="false" />
+
+  <arg     if="$(arg respawn)" name="bond" value="" />
+  <arg unless="$(arg respawn)" name="bond" value="--no-bond" />
+
+  <!-- Nodelet manager -->
+	<node pkg="nodelet" type="nodelet" args="manager" name="$(arg manager)" output="screen"/>
+
+  <!-- Resize left image -->
+  <node name="resized_left" pkg="nodelet" type="nodelet"
+      args="load image_proc/resize $(arg manager) $(arg bond)"
+	respawn="$(arg respawn)">
+    <remap from="image" to="$(arg left)/image_raw" />
+    <remap from="camera_info" to="$(arg left)/camera_info" />
+    <remap from="~image" to="$(arg rs_prefix)/$(arg left)/image_raw" />
+    <remap from="~camera_info" to="$(arg rs_prefix)/$(arg left)/camera_info" />
+    <param name="scale_width" value="$(arg scale_width)" />
+    <param name="scale_height" value="$(arg scale_height)" />
+  </node>
+
+  <!-- Resize right image -->
+  <node name="resized_right" pkg="nodelet" type="nodelet"
+      args="load image_proc/resize $(arg manager) $(arg bond)"
+	respawn="$(arg respawn)">
+    <remap from="image" to="$(arg right)/image_raw" />
+    <remap from="camera_info" to="$(arg right)/camera_info" />
+    <remap from="~image" to="$(arg rs_prefix)/$(arg right)/image_raw" />
+    <remap from="~camera_info" to="$(arg rs_prefix)/$(arg right)/camera_info" />
+    <param name="scale_width" value="$(arg scale_width)" />
+    <param name="scale_height" value="$(arg scale_height)" />
+  </node>
+
+</launch>

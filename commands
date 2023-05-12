@@ -1,0 +1,20 @@
+roscore # start this in container before executing any of the below commands
+# REPLACE ALL HASH BELOW WITH YOUR CONTAINER ID
+
+# play video file
+docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && rosbag play rotating_detergent_1_6.bag"
+
+# start resize node
+docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && source ~/catkin_ws/devel/setup.bash && ROS_NAMESPACE=narrow_stereo_textured roslaunch --wait dummy_image_resize image_resize.launch"
+
+# to use default stereo_image_proc
+docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && ROS_NAMESPACE=narrow_stereo_textured rosrun stereo_image_proc stereo_image_proc"
+# to use default stereo_image_proc with image_resize
+docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && ROS_NAMESPACE=narrow_stereo_textured/rs rosrun stereo_image_proc stereo_image_proc"
+
+# to use custom stereo_image_proc
+docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && source ~/catkin_ws/devel/setup.bash && ROS_NAMESPACE=narrow_stereo_textured rosrun stereo_image_proc stereo_image_proc"
+# to use custom stereo_image_proc with image_resize
+docker exec -d 60ce24fe3d92 /bin/bash -c "source ros_entrypoint.sh && source ~/catkin_ws/devel/setup.bash && ROS_NAMESPACE=narrow_stereo_textured/rs rosrun stereo_image_proc stereo_image_proc"
+
+
