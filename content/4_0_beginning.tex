@@ -66,7 +66,7 @@ Wird ein manueller Flug durchgeführt, kommt zuerst eine Warnung, dann stoppt di
     \label{fig:qgc_mission_geofence}
 \end{figure}
 
-\section{Flug mit ROI}
+\section{Flug mit Region of Interest}
 \glspl{roi} dienen der Orientierung der Drohne während einer Mission. Es können \glspl{roi}-Punkte gleich den Wegpunkten auf der Karte gesetzt werden. Um die Ausrichtung zu Verdeutlichen wurde Bild \ref{fig:qgc_mission_roi} aufgenommen. Es zeigt die Drohne als roten Pfeil, in Richtung des mit \enquote{R} markierten Punktes schauend. Ein Punkt ist solange gültig, bis er abgewählt oder ersetzt wird.
 
 Das \gls{roi}-Kommando welches von \acrshort{mav} übertragen wird, kann später verwendet werden, um die Drohne gezielt auf Hindernisse zeigen zu lassen, falls diese sich außerhalb des Sichtbereiches der Sensoren aber noch innerhalb des Gefahrenbereiches der Drohne befinden.
@@ -74,7 +74,7 @@ Das \gls{roi}-Kommando welches von \acrshort{mav} übertragen wird, kann später
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{images/mission_roi.png}
-    \caption[QGroundControl Missionplaner-ROI]{QGroundControl Missionplaner-ROI: Während einer Mission zeigt die Drohne mit ihrer Spitze in Richtung der mit \enquote{R} markierten ROI}
+    \caption[QGroundControl Missionplaner-ROI]{QGroundControl Missionplaner-ROI: Während einer Mission zeigt die Drohne mit ihrem Bug in Richtung der mit \enquote{R} markierten ROI}
     \label{fig:qgc_mission_roi}
 \end{figure}
 

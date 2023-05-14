@@ -3,6 +3,9 @@
 Um die Avoidance-Software umzusetzen, wird diese vorher in verschiedenen Modi erprobt. Dazu zählt eine Simulation. Aus dieser können die Strukturen zum Einsatz mit realer Hardware übernommen werden. Als Zwischenschritt wird die \gls{hil}-Simulation aus dem vorhergehenden Projektteil überarbeitet.
 
 \section{Avoidance als Simulation in Software}\label{chap:sim_gazebo}
+Das Kapitel spaltet sich auf in die Beschreibung und nachfolgend die programmiertechnischen Schritte zur Umsetzung.
+
+\subsection*{Beschreibung der Umsetzung von Avoidance}
 Das Avoidance-Modul arbeitet eng mit der Simulationssoftware \enquote{Gazebo} zusammen. In der Dokumentation \cite{dronecodestiftungObstacleDetectionAvoidance2023} ist die Simulation umfangreich dokumentiert, die Umsetzung des Projektes auf reale Hardware jedoch kurz gehalten.\\
 Ein vollständiges Linux Ubuntu 20.04 wird benötigt, um die Software per Simulation verwenden zu können. Die Installation beinhaltet eine komplette \acrshort{ros}-Distribution mit graphischen Tools. Mithilfe mehrerer, sich gegenseitig aufrufenden, \enquote{Launch-Files} wird die Simulation instrumentiert und, aufeinander abgestimmt, gestartet. Ohne weiteres Zutun muss nur das Hauptscript zur jeweiligen Simulation aufgerufen werden. Folgend aufgelistet die vier primären Software Bestandteile:
 \begin{description}
@@ -22,7 +25,7 @@ Für die Untersuchung der gegebenen Situation wird zusätzliche Software verwend
     \item[tftree:] Verknüpfungen im Transformationsbaum zur Bestimmung der Position der Drohne und derer Peripherie im Bezug zum Ursprung 
 \end{description}
 
-Die Interaktion der Bestandteile ist in Abbildung \ref{fig:system_sim_origin} noch einmal dargestellt. Auf rechter Seite gezeichnet sind die Bestandteile in der \enquote{\acrshort{ros}-Umgebung}, welche in die Endanwendung übernommen werden können. Die vollen Aufgaben des Simulators wurden eingekürzt, sie sind zu lesen in \cref{chap:intro_simulation} und \cite[Kapitel 3.4.1]{markusreinErweiterungBestehenderDrohnen2023}. Zusätzlich stellt der Simulator Kamerabilder bereit, je nach gewähltem Modus direkt Tiefenbilder oder Stereobilder welche weiter verarbeitet werden müssen. 
+Die Interaktion der Bestandteile ist in Abbildung \ref{fig:system_sim_origin} noch einmal dargestellt. Auf rechter Seite gezeichnet sind die Bestandteile in der \enquote{\acrshort{ros}-Umgebung}, welche in die Endanwendung übernommen werden können. Die vollen Aufgaben des Simulators wurden eingekürzt, sie sind zu lesen in \cref{chap:intro_simulation} und \cite[Kapitel 3.4.1]{markusreinErweiterungBestehenderDrohnen2023}. Zusätzlich stellt der Simulator Kamerabilder bereit, je nach gewähltem Modus direkt Tiefenbilder oder Stereobilder, welche weiter verarbeitet werden müssen. 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=\linewidth]{images/simulation_ros.drawio.png}
@@ -56,6 +59,11 @@ erzeugt, muss auch eine entsprechende Transformation angelegt werden. Für die T
     \label{fig:sim_gazebo_tftree}
 \end{figure}
 
+\subsection*{Programmierung der Umsetzung von Avoidance}
+Im GitHub\cite{dronecodestiftungObstacleDetectionAvoidance2023} ist eine Anleitung zur Installtation von \textit{Avoidance} gegeben. Diese sieht nicht vor in einem Container betrieben zu werden, auch ist die Performance meist nicht ausreichend. Stattdessen wird ein separater Computer benötigt. Im Zweifallsfall funktioniert \textit{Avoidance} doch auch mit den in GitHub bereitgestellten Containern. Es müssen Pakete mit graphischen Anwendungen (bspw. \textit{rviz}, \textit{rqt-reconfigure}) jedoch noch manuell installiert werden, wie in den Dockerfiles von \cite[Kapitel 5]{markusreinErweiterungBestehenderDrohnen2023}\footnote{siehe \url{https://github.com/aur20/T3000-autonomous_drone/tree/airsim_avoidance}} gezeigt.
+
+Anschließend muss der PX4-Flightstack\footnote{https://github.com/PX4/avoidance.git} heruntergeladen werden (bisher im ersten Teil der Arbeit umgangen). Es sind weitere Schritte notwendig, um die Umgebungsvariablen für \textit{Gazebo} und diesen zu setzen. Im Rahmen dieser Arbeit wurden die Schritte als Script zusammengefasst, abgedruckt in Listing \ref{listing:setup_gazebo.sh}. Das Script muss aus dem Verzeichnis \textit{~/catkin\_ws/} ausgeführt werden und der PX4-Flightstack muss sich im Verzeichnis \textit{~/catkin\_ws/src/PX4-Autopilot} befinden.
+
 \section{Avoidance als Simulation mit Hardware}
 Als nächste Stufe der Simulation kommt der Simulator \enquote{AirSim} von Microsoft zum Einsatz. Mit \textit{AirSim} stehen die gleichen Möglichkeiten zur Simulation wie mit \textit{Gazebo} zur Verfügung. Allerdings, kann \textit{AirSim} für das Projekt nur mit einem Windows PC zum verwendet werden. Dadurch ergeben sich Beschränkungen, wodurch \textit{AirSim} keine Verbindung zum simulierten Flugcontroller aufbauen kann. Jedoch kann der reale Flugcontroller wie in \cite[Kapitel 5]{markusreinErweiterungBestehenderDrohnen2023} als \gls{hil}-Simulation betrieben werden. Die Veränderungen im Aufbau für die Simulation sind in Bild \ref{fig:system_sim_airsim} rot markiert, die Funktionen der Bestandteile bleiben die gleichen wie in \cref{chap:sim_gazebo}. Hinzu kommt der Bordcomputer, der eine netzwerkgebundene Kommunikation mit dem Flugcontroller erlaubt und der Knoten \enquote{AirSim-Node}, durch den Bilder aus der Simulation ausgelesen werden können. Dabei entfällt das Zusammenfügen zweier Stereobilder, denn die Simulation liefert direkte Tiefenbilder.
 
@@ -77,8 +85,8 @@ Zur Änderung der Funktionalität werden die \textit{Launch-Files} und \enquote{
     \item \textit{avoidance\_sitl\_stereo.launch}:
     \begin{itemize}
         \item Umbenannt zu \textit{avoidance\_hitl\_airsim.launch}
-        \item Entfernen der Stereo-Bildverarbeitung, stattdessen Berechnung der Punktwolkendarstellung aus Tiefenbild von \textit{AirSim}
-        \item Entfernen der Transformation von \enquote{fcu} auf \enquote{camera\_link}, da Punktwolkendarstellung noch nicht bekannt
+        \item Entfernen der Stereo-Bildverarbeitung, stattdessen Berechnung der Punktwolkendarstellung durch Aufruf von eigens kompiliertem \textit{depth\_image\_proc} aus Tiefenbild von \textit{AirSim}
+        \item Entfernen der Transformation von \enquote{fcu} auf \enquote{camera\_link}, da Transformation von Punktwolkendarstellung noch nicht bekannt
         \item Unteraufruf von \textit{avoidance\_hitl\_airsim\_mavros.launch} anstatt \textit{avoidance\_sitl\_mavros.launch}
     \end{itemize}
     \item \textit{avoidance\_sitl\_mavros.launch}:
@@ -106,8 +114,6 @@ Zur Änderung der Funktionalität werden die \textit{Launch-Files} und \enquote{
 
 Als Simulation von \textit{AirSim} wurde die \enquote{Blocks}-Umgebung gewählt, eine einfache Welt mit wenigen Objekten. Die Ausgangssituation ist dargestellt im Anhang unter \ref{fig:sim_airsim}. Dabei steht die Drohne vor einem großen Quader. Rechts vom Quader befindet sich eine Kugel.
 
-Probleme die bei der Durchführung durchlaufen wurden, umfassen unter anderem, dass \textit{AirSim} von einem Koordinatensystem im Format \enquote{ENU} (East-North-Up) als die Interpretation der Welt, in der sich die Drohne befindet, ausgeht. Von \textit{mavros} wird die Drohne hingegen im Format \enquote{NED} (North-East-Down) beschrieben. Somit ist das erfasste Kamerabild nicht vor, sondern rechts der Drohne und steht Kopfüber. Die erfasste Punktwolke der Ausgangssituation ist zu sehen in Bild . Anschließende Anpassungen des Transformationsbaums ergeben eine Ansicht wie in . Der finale Transformation ist in Bild  abgebildet.
+Probleme die bei der Durchführung durchlaufen wurden, umfassen unter anderem, dass \textit{AirSim} von einem Koordinatensystem im Format \enquote{ENU} (East-North-Up) als die Interpretation der Welt, in der sich die Drohne befindet, ausgeht. Von \textit{mavros} wird die Drohne hingegen im Format \enquote{NED} (North-East-Down) beschrieben. Somit ist das erfasste Kamerabild nicht vor, sondern rechts der Drohne und steht Kopfüber.
 
-Das ganze funktioniert so nicht... wer hätts gedacht
-
-\clearpage
+Die weitere Entwicklung wurde an diesem Punkt aufgrund mangelnder Zeit eingestellt. Eine Simulation ist bereits vorhanden und lauffähig, der Zwischenschritt \textit{AirSim} wird übersprungen. Bisherige Entwicklungen sind hinterlegt im GitHub\footnote{\url{https://github.com/aur20/T3000-autonomous_drone/tree/airsim_avoidance}}.
