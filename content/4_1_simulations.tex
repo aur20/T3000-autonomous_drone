@@ -1,11 +1,20 @@
 \chapter{Vorbereitung zur Umsetzung von Avoidance}\label{chap:intro_avoidance}
+Die Umsetzung der Flugplanung soll mittels der Software \textit{Avoidance} erfolgen. Diese arbeitet auf dem Metabetriebssystem \acrshort{ros}, welches wiederum auf \textit{Ubuntu} aufsetzt. (Im Anwendungsfall ROS Noetic auf Ubuntu 20.04.) Die Software kann vollständig auf einem \gls{rpi} betrieben werden. Somit kann der Bordcomputer-\gls{rpi} weitere Aufgaben, wie nachfolgend dargestellt, erfüllen. Das angestrebte System ist dargestellt in Bild \ref{fig:system_added_sensors}.
+
+\begin{itemize}
+    \item Ubuntu 20.04 als Betriebssystem (nur indirekt innerhalb eines Containers möglich)
+    \item \acrshort{ros}-Noetic innerhalb des Docker-Containers
+    \item Einlesen der Ultraschallsensordaten, erzeugen von Tiefenkarte und publizieren entsprechender Topic
+    \item Einlesen der Kamerabilder, erzeugen von Tiefenkarte und publizieren entsprechender Topic
+    \item Ausführung von Avoidance
+\end{itemize}
 
 Um die Avoidance-Software umzusetzen, wird diese vorher in verschiedenen Modi erprobt. Dazu zählt eine Simulation. Aus dieser können die Strukturen zum Einsatz mit realer Hardware übernommen werden. Als Zwischenschritt wird die \gls{hil}-Simulation aus dem vorhergehenden Projektteil überarbeitet.
 
 \section{Avoidance als Simulation in Software}\label{chap:sim_gazebo}
 Das Kapitel spaltet sich auf in die Beschreibung und nachfolgend die programmiertechnischen Schritte zur Umsetzung.
 
-\subsection*{Beschreibung der Umsetzung von Avoidance}
+\subsection{Beschreibung der Umsetzung von Avoidance}
 Das Avoidance-Modul arbeitet eng mit der Simulationssoftware \enquote{Gazebo} zusammen. In der Dokumentation \cite{dronecodestiftungObstacleDetectionAvoidance2023} ist die Simulation umfangreich dokumentiert, die Umsetzung des Projektes auf reale Hardware jedoch kurz gehalten.\\
 Ein vollständiges Linux Ubuntu 20.04 wird benötigt, um die Software per Simulation verwenden zu können. Die Installation beinhaltet eine komplette \acrshort{ros}-Distribution mit graphischen Tools. Mithilfe mehrerer, sich gegenseitig aufrufenden, \enquote{Launch-Files} wird die Simulation instrumentiert und, aufeinander abgestimmt, gestartet. Ohne weiteres Zutun muss nur das Hauptscript zur jeweiligen Simulation aufgerufen werden. Folgend aufgelistet die vier primären Software Bestandteile:
 \begin{description}
@@ -40,7 +49,7 @@ Eine erste Überprüfung des Algorithmus wird die Simulation wie in der Anleitun
     \item Die Punktwolke der Kamerabilder noch einmal gefiltert wird
 \end{itemize} 
 
-Die Anfangsbedingungen der Simulation sind eine vor Bäumen stehende Drohne. Das Bild aus der Simulation ist abgedruckt im Anhang unter \ref{fig:sim_gazebo}. Von der Drohne werden 2 virtuelle Kamerabilder erzeugt, aus welchen eine Punktwolke gebildet wird. Die Punktwolke ist in Bild \ref{fig:sim_gazebo_stereo} links dargestellt. Der Algorithmus zur Erzeugung der Punktwolke ist anfällig für Rauschen verursacht durch minimale Bewegungen in den Kamerabildern, sodass im Bild Artefakte enthalten sind. Deshalb wurde die Punktwolke noch einmal mit einem VoxelGrid\footnote{\url{http://wiki.ros.org/pcl_ros/Tutorials/VoxelGrid\%20filtering}\cite{openroboticsDocumentationROSWiki}} gefiltert, abgebildet in \ref{fig:sim_gazebo_stereo} rechts. Für die Verwendung der Punktwolke mit Avoidance macht das Filtern keine Auswirkung, der \textit{Local Planner} kommt auch mit den ursrpünglichen Daten der Punktwolke zurecht.
+Die Anfangsbedingungen der Simulation sind eine vor Bäumen stehende Drohne. Das Bild aus der Simulation ist abgedruckt im Anhang unter \ref{fig:sim_gazebo}. Von der Drohne werden 2 virtuelle Kamerabilder erzeugt, aus welchen eine Punktwolke gebildet wird. Die Punktwolke ist in Bild \ref{fig:sim_gazebo_stereo} links dargestellt. Der Algorithmus zur Erzeugung der Punktwolke ist anfällig für Rauschen verursacht durch minimale Bewegungen in den Kamerabildern, sodass im Bild Artefakte enthalten sind. Deshalb wurde die Punktwolke noch einmal mit einem VoxelGrid\footnote{\url{http://wiki.ros.org/pcl_ros/Tutorials/VoxelGrid\%20filtering}\cite{openroboticsDocumentationROSWiki}} gefiltert, abgebildet in \ref{fig:sim_gazebo_stereo} rechts. Die Einstellungen des Filters sind in Listing \ref{listing:voxel_grid.launch} festgehalten. Das Bild wird auf den Nahbereich vor der Kamera beschränkt. Für die Verwendung der Punktwolke mit Avoidance macht das Filtern keine Auswirkung, der \textit{Local Planner} kommt auch mit den ursrpünglichen Daten der Punktwolke zurecht.
 
 \begin{figure}[!ht]
     \centering
@@ -59,7 +68,7 @@ erzeugt, muss auch eine entsprechende Transformation angelegt werden. Für die T
     \label{fig:sim_gazebo_tftree}
 \end{figure}
 
-\subsection*{Programmierung der Umsetzung von Avoidance}
+\subsection{Programmierung der Umsetzung von Avoidance}
 Im GitHub\cite{dronecodestiftungObstacleDetectionAvoidance2023} ist eine Anleitung zur Installtation von \textit{Avoidance} gegeben. Diese sieht nicht vor in einem Container betrieben zu werden, auch ist die Performance meist nicht ausreichend. Stattdessen wird ein separater Computer benötigt. Im Zweifallsfall funktioniert \textit{Avoidance} doch auch mit den in GitHub bereitgestellten Containern. Es müssen Pakete mit graphischen Anwendungen (bspw. \textit{rviz}, \textit{rqt-reconfigure}) jedoch noch manuell installiert werden, wie in den Dockerfiles von \cite[Kapitel 5]{markusreinErweiterungBestehenderDrohnen2023}\footnote{siehe \url{https://github.com/aur20/T3000-autonomous_drone/tree/airsim_avoidance}} gezeigt.
 
 Anschließend muss der PX4-Flightstack\footnote{https://github.com/PX4/avoidance.git} heruntergeladen werden (bisher im ersten Teil der Arbeit umgangen). Es sind weitere Schritte notwendig, um die Umgebungsvariablen für \textit{Gazebo} und diesen zu setzen. Im Rahmen dieser Arbeit wurden die Schritte als Script zusammengefasst, abgedruckt in Listing \ref{listing:setup_gazebo.sh}. Das Script muss aus dem Verzeichnis \textit{~/catkin\_ws/} ausgeführt werden und der PX4-Flightstack muss sich im Verzeichnis \textit{~/catkin\_ws/src/PX4-Autopilot} befinden.
@@ -73,6 +82,19 @@ Als nächste Stufe der Simulation kommt der Simulator \enquote{AirSim} von Micro
     \caption[Systemaufbau der Simulation von Avoidance als \gls{hil}-Simulation]{Systemaufbau der Simulation von Avoidance als \gls{hil}-Simulation: Links Simulator (AirSim) und Flugcontroller (\gls{hil}), Rechts Bestandteile des \acrshort{ros}}
     \label{fig:system_sim_airsim}
 \end{figure}
+
+Zum Vorgehen wird der \gls{hil}-Aufbau mit dem Simulator \textit{AirSim} von Microsoft\cite{microsoftcorporationWelcomeAirSim2023}, wie in \cite[Kapitel 3.4.1]{markusreinErweiterungBestehenderDrohnen2023} beschrieben, verwendet. Bild \ref{fig:system_sim} zeigt, in Anlehnung an Bild \ref{fig:system_intro}, die durch die Simulation übernommenen Funktionen. Die Komponenten sind im Betrieb wie folgt verbunden:
+\begin{description}
+    \item[PC-Flugcontroller:] \acrshort{usb}-Kabel, direkte Kommunikation \textit{AirSim}-Flugcontroller
+    \item[PC-Bordcomputer:] \acrshort{wlan}, Verbindung Bodenstation mit Flugcontroller
+\end{description}
+
+Die Aufgaben der Komponenten während der Entwicklung sind:
+\begin{description}
+    \item[Simulation:] In der Simulation werden sowohl alle physikalischen Effekte berechnet als auch die virtuelle Umgebung der Drohne dargestellt. Die Sensordaten werden der Drohne direkt von der Simulation eingespeist. Eine resultierende Ansteuerung der Motoren wird in die Simulation übernommen. Somit kann sich die Drohne in der Simulation wie in realer Umgebung bewegen. Außerdem werden von der Drohne aufgenommene, simulierte Kamerabilder bereitgestellt.
+    \item[Drohne:] Der Flugcontroller auf der Drohne wird im \gls{hil}-Modus betrieben. Alle Ein- und Ausgänge zum Controller werden durch virtuelle Schnittstellen der Simulation ersetzt. Die Kommunikation mit dem Bordcomputer bleibt dieselbe wie zuvor, sodass die Drohne per Bodenstation gesteuert werden kann.
+    \item[Bordcomputer:] Wird weiterhin nur zur Kommunikation zwischen Bodenstation und Flugcontroller verwendet. Erweiterte Funktionen werden auf einem separaten Rechner entwickelt und getestet um anschließend auf den Bordcomputer überspielt zu werden.
+\end{description}
 
 Zur Änderung der Funktionalität werden die \textit{Launch-Files} und \enquote{airsim\_ros\_pkgs} (Bibliothek zur Drohnensteuerung im \textit{AirSim}-Simulator) nacheinander angepasst:
 \begin{enumerate}

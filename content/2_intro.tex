@@ -1,14 +1,117 @@
-\chapter{Einführung in Projekt}
-Auf physikalische Zusammenhänge wird in der Arbeit nicht eingegangen, da am bestehenden System Drohne keine Änderungen vorgenommen werden. Es wird lediglich die Software angepasst, was die Flugfähigkeit aber nicht beeinflußt.
+\chapter{Einführung in das Projekt}
+Im diesem Kapitel werden verwendete Technologien erläutert. Dabei wird auf die Eigenheiten der Verbindung zur Drohne und den Sensoren eingegangen.
 
 \section{Verwendete Technologien}
-\subsection{WLAN}
-\subsection{GPS}
-\subsection{Serielle Verbindungsprotokolle}
+Im Projekt kommen 3 Schnittstellen und ein Software-Protokoll zum Einsatz. Sie werden in dieser Reihenfolge erläutert.
+\subsection{Wireless Local Area Network}
+\gls{wlan} wird als Oberbegriff für lokale Funknetzwerke der IEEE 802.11 verwendet. Es ermöglicht eine drahtlose Datenübertragung und -verarbeitung. Die Geräte senden im 2,4 GHz (ISM-Band) oder 5 GHz Frequenzband. Meist wird es genutzt um mobilen Endgeräten einen Netzzugang zum Internet bereitzustellen. Andererseits kann auch die Reichweite eines kabelgebundenen Netzwerks durch das Überbrücken an schwer zugänglichen Stellen erweitert werden.
+%WLAN-Fähigkeit in Endgeräten durch Funkmodul: WLAN-Adapter (= Schnittstellenkarte in Erweiterungssteckplatz auf der Hauptplatine)
 
-\section{Beschreibung der Drohne in den einzelnen Phasen}
-\subsection{Beschreibung des Ausgangsystems Drohne}
-Die Drohne kann mit Methoden der Regelungstechnik als adaptives System beschrieben werden. Dabei dient der Flugcontroller als Regler, die Motoren als Steuerstrecke, und Bordcomputer sowie Bodenstation zur Identifikation und Modifikation der Parameter. Zu Beginn wird die Drohne in ihrer Ausgangslage, ohne automone Flugfähigkeiten beschrieben. Die Bestandteile des Systems sind zunächst in Tabelle \ref{tab:system_intro} aufgelistet.
+Bei der Verwendung von \gls{wlan} ergeben sich folgende Einschränkungen:
+\begin{itemize}
+    \item Geringe Reichweite (ca. $20$-$30m$)
+    \item Schwankende Datenrate, Störanfälligkeit, unzuverlässige Verbindung
+    \item Teilung der verfügbaren Bandbreite über alle Teilnehmer
+    \item Langsamer als vergleichbare kabelgebundene Techniken
+\end{itemize}
+
+Zum Aufbau eines Netzwerkes muss eine Basisistation als Hotspot (auch \enquote{Wireless Access Point} oder \enquote{Gateway} genannt) eingerichtet werden, mit der sich Clients verbinden können. Daten können nur zwischen Client und Basisistation ausgetauscht werden, nicht aber zwischen Client und Client.
+
+Eine Kommunikation erfolgt durch weitere aufbauende Protokolle. Zwangsläufig kommen die Netzwerkprotokolle IP und TCP/UDP zum Einsatz.
+
+Das IP-Protokoll benennt Addressen im Netzwerk. Die Basisistation muss alle beteiligten Geräte und deren Addressen vermerken und ist meist auch für die Verteilung der Adressen zuständig (DHCP-Server Funktion zum Zuweisen der Addressen).
+
+Mit dem TCP-Protokoll wird Vermittlung und Transport von Datenpaketen sichergestellt:
+\begin{itemize}
+    \item Protokolle bestimmen Ablauf der Kommunikation zwischen den Systemen %(Sammlung von Regeln zum Aufbau, Austausch, Ende)
+    \item Sorgt dafür, dass Datenpakete innerhalb eines dezentralen Netzwerks beim Empfänger ankommen
+	\item Verbindungsorientiert, Verhindert von Datenverlust
+    \item Aufteilung von Dateien und Datenströmen
+    \item Datenpakete den Anwendungen zuordnen
+	\item Virtuelle Ende-zu-Ende-Kommunikation (Sender und Empfänger während Verbindung dauerhaft in Kontakt)
+\end{itemize}
+Es treten weitere Verfänglichkeiten auf:
+\begin{itemize}
+    \item Empfänger bestätigt jedes empfangene Datenpaket
+    \item Keine Bestätigung führt zu Wiederholung Sendevorgang
+	\item Verbindungaufbau über Three-Way-Handshake (Verbindungswunsch vom Client, Bestätigung Anfrage durch Server, Verbindungswunsch durch Server, Bestätigung Client)
+\end{itemize}
+
+Somit ist die Übertragung über TCP besonders langsam. Im Außenbereich bei größeren Entfernung kann es zu Verbindungsabbrüchen kommen.
+
+Im Gegensatz dazu arbeitet das UDP-Protokoll nach dem Fire-and-Forget-Prinzip. Daten werden ohne Kontrolle gesendet. Es kommt beim bspw. beim Streaming von Bild- und Ton Inhalten zum Einsatz. Beim Datenverkehrt über \gls{wlan} wird stark von UDP abgeraten, denn auftretende Verluste können nicht korrigiert werden.
+
+\subsection{Serielle Schnittstelle}
+Die Serielle Schnittstelle wird in der Fachwelt als \gls{uart} bezeichnet.
+
+Sie verbindet 2 Kommunikationspartner und besteht aus 1 bzw. 2 Leitungen. Letzterer Fall kommt im Projekt für eine bidirektionale Kommunikation zum Einsatz: je eine Leitung wird für die Verbindung in eine Richtung verwendet. Die Leitungen heißen respektive Transmit (Tx) und Receive (Rx). Sie werden jeweils über Kreuz mit den Endstellen verbunden, sodass zwei Tx-Rx Paarungen entstehen. Zusätzliche Leitungen können für die Synchronisation (bspw. Aktivschalten des Kanals) vorkommen.
+
+Für die Kommunikation müssen beide Teilnehmer in den Parametern übereinstimmen:
+\begin{itemize}
+    \item Baudrate (Übertragungsgeschwindigkeit je Zeichen)
+    \item Wortlänge (Bit je Übertragung)
+    \item Parity Bit (optional am Ende jeden Wortes)
+    \item Länge des Stopbits (Zeitdauer in Baud)
+\end{itemize}
+
+Je nach Anwendungszweck ist \gls{uart} auf eine bestimmte Leiterspannung ausgelegt. Bei der Verwendung von Microcontrollern kommt häufig ein Pegel von $3.3V$ oder $5V$ zum Einsatz. Im Leerlauf weisen die Leitungen ein High (hoher Pegel) auf. Zu Beginn einer Übertragung wird das Startbit auf Low gesetzt. Es folgt eine Wortlänge and Datenbits, ein Parity Bit und ein Stopbit.\newline
+
+Sind alle Parameter gleich können ohne weitere Absprache digitale Werte versendet/empfangen werden. Die intterpretation erfolgt dann von entsprechender Software.
+
+\subsection{Inter-Integrated Circuit}
+Mit \gls{i2c} können Microcontroller und Peripherie beliebig verbunden werden. Das System erlaubt das Zusammenschalten von einem Master mit bis zu 127 Slaves.
+
+Es können Geräte unterschiedlicher Spannungspegel verbunden werden. Die Leitung wird mit dem Minimum der höchsten verträglichen Spannungen der Busteilnehmer betrieben. Alle Teilnehmer müssen diese als High interpretieren.
+
+\gls{i2c} verwendet 2 Leitungen, genannt Data (SDA) und Clock (SCL). Auf der Leitung Clock wird vom Master ein Takt erzeugt. Dieser kann aber auch von einem Slave auf Low (niedriger Pegel) gehalten (Verbindung gegen Masse) werden, wenn dieser noch Rechenzeit zur Verarbeitung benötigt, fachsprachl. Clock Stretching. Nutzdaten werden bei steigender Flanke der Clock auf der Data Leitung übertragen.
+
+Eine Kommunikation läuft folgendermaßen ab:
+\begin{enumerate}
+    \item Kommunikationsbeginn durch heruntersetzen der SDA-Leitung während SCL auf High ist
+    \item Master schreibt 7 Bit als Adresse des Slave
+    \item Master schreibt 8. Bit als Lese- oder Schreib-Bit
+    \item Bestätigung durch Slave (Bit auf Low)
+    \item Master oder Slave schreibt vorgegebene Anzahl Nutzdaten
+    \item (Direktes Fortsetzten der Kommunikation bspw. als Antwort auf Anfrage) 
+\end{enumerate}
+
+\subsection{MAVLink}
+\gls{mav} ist ein Übertragungsprotokoll welches von der Dronecode Stiftung entwickelt wird\footnote{\url{https://mavlink.io/en/}}. Es wird zur Kommunikation von Drohnen mit derer Peripherie eingesetzt.
+
+Dabei ist \gls{mav} zuständig für das binäre Kodieren von Informationen. Das Protokoll definiert Nachrichten aus einer Auszeichnungssprache (XML) welche dann kompiliert werden. Je nach Gerät wird ein bestimmter Satz Nachrichten implementiert.
+
+Ein \gls{mav}-Netzwerk kann aus bis zu 255 Geräten und Bodenstationen bestehen, die ähnlich einem LAN-Netzwerk, Nachrichten miteinander austauschen. Dabei legt das Protokoll großen Wert auf geringen Overhad in den einzelnen Nachrichten um bei geringer Bandbreite arbeiten zu können.
+
+Trotzdem implementiert \gls{mav} Mechanismen zur Überwachung der Datenkonsistenz. Zum Einsatz kommen Paketnummern und CRC-Checksummen. Somit kann es Fehler/Störungen in der Übertragung erkennen und ausgleichen. Es ist für eine Übertragung über verschiedene, auch einfache, Kommunikationskanäle (bspw. RC-Funktempfänger) geeignet.
+
+\section{Beschreibung der Drohne}
+Eine Drohne steht seit den Ausarbeitungen \cite{wirthErweiterungBestehendenDrohne2022} und \cite{wirthErweiterungBestehendenDrohne2022a} bereit. Im Rahmen des Projektes \cite{markusreinErweiterungBestehenderDrohnen2023} wurden die Ultraschallsensoren neu befestigt. Ein Gesamteindruck der Drohne ist gegeben in den Bildern \ref{fig:drohne_schraeg_vorn} und \ref{fig:drohne_oben}. Nach einem bereits älteren Unfall wurde die Halterung des linken Standfußes per 3D-Druck erneuert, siehe Bild \ref{fig:drohne_fuss}. Das Modell des Bauteils stammt von \footnote{\url{https://www.thingiverse.com/thing:3761929}}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/drohne_schraeg_vorn.png}
+    \caption[Gesamtansicht Drohne vorn]{Gesamtansicht Drohne vorn: viermal rot umrahmt die Ultraschallsensoren, blau umrahmt der Arduino (Auslesen der Sensoren), grün umrahmt der Raspberry Pi (Bordcomputer), gelb umrahmt der Flugcontroller (\acrshort{px4})}
+    \label{fig:drohne_schraeg_vorn}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/drohne_oben.png}
+    \caption[Gesamtansicht Drohne oben]{Gesamtansicht Drohne oben}
+    \label{fig:drohne_oben}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/drohne_fuss.png}
+    \caption[Standbeine der Drohne]{Standbeine der Drohne: das T-Stück zur Verbindung des Linken Beines mit dem Fuß wurde ausgewechselt}
+    \label{fig:drohne_fuss}
+\end{figure}
+
+% Die Drohne kann mit Methoden der Regelungstechnik als adaptives System beschrieben werden. Dabei dient der Flugcontroller als Regler, die Motoren als Steuerstrecke, und Bordcomputer sowie Bodenstation zur Identifikation und Modifikation der Parameter.
+Die Drohne in ihrer Ausgangslage, ohne automone Flugfähigkeiten, kann durch 3 wesentliche Bestandteile beschrieben werden. Diese sind aufgelistet in Tabelle \ref{tab:system_intro}.
+Nähere Beschreibungen folgen in den nächsten Kapiteln zusammen mit der Erläuterung zu den angebauten Ultraschallsensoren. Zusammen bilden sie ein System wie in Bild \ref{fig:system_intro} gezeigt. Im Flugbetrieb werden von der Bodenstation Flugbefehle (feste Zielkoordinaten, relative Koordinaten, oder manuelle Motoransteuerung) an den Bordcomputer und von diesem weiter an den Flugcontroller, geschickt. Mehr Details zur Steuerung mit der Bodenstation in \cref{chap:intro_capabilities}.
 
 \begin{table}[!ht]
     \caption{Systemübersicht Drohne und Bodenstation}
@@ -23,42 +126,49 @@ Die Drohne kann mit Methoden der Regelungstechnik als adaptives System beschrieb
     \end{tabularx}
 \end{table}
 
-Zusammen bilden sie ein System wie in Bild \ref{fig:system_intro} gezeigt. Im Flugbetrieb werden von der Bodenstation Flugbefehle (feste Zielkoordinaten, relative Koordinaten, oder manuelle Motoransteuerung) per \acrshort{wlan}-Verbindung an den Bordcomputer, von diesem per Serieller Schnittstelle (\acrshort{uart}) an den Flugcontroller, geschickt. Mehr Details zur Steuerung mit der Bodenstation in \cref{chap:intro_capabilities}. Der Flugcontroller steuert anschließend die Motoren um die gewünschte Position zu erreichen. Als Eingabegrößen stehen dem Flugcontroller Sensordaten von Beschleunigungssensor, Kompass (erstere bilden zusammen die \gls{imu}) und Barometer, diese sind im Flugcontroller integriert, und der GPS-Antenne zur Verfügung.
+\subsection{Flugcontroller}
+Der Flugcontroller vom Typ \gls{px4} ist Bestandteil der ursrpünglichen Drohne. Er allein verfügt über die Steuerung der Drohne, kann aber Kommandos von anderer Peripherie erhalten.
 
-\subsection{Beschreibung des Zielsystem Drohne mit autonomer Flugfähigkeit}
-Zusätzliche Sensoren stellen Daten für Berechnungen auf dem Bordcomputer bereit. Diese müssen ausgewertet und die Ergebnisse dem Flugcontroller zugespielt werden. Das Auswerten und Zuspielen der Daten ist zeitkritisch denn es beeinflußt direkt den Flug der Drohne. Im Idealfall sollten Berechnungen direkt auf dem Flugcontroller oder in unmittelbarem Zusammenhang mit diesem durchgeführt werden. Zu den Aufgaben zählt:
+Er verfügt sowohl über integrierte Sensoren: Beschleunigungssensor, Kompass und Barometer; als auch dass er mit der \acrshort{gps}-Antenne verbunden ist. Weiterhin besitzt er Anschlüsse zu den \gls{esc} der Motoren. Außerdem kann an ihm eine RC-Fernsteuerung angeschlossen werden, allerdings wird für dieses Projektes keine Fernsteuerung benötigt.
+Weitere Sensoren oder Aktoren lassen sich über verschiedene Schnittstellen an den Flugcontroller anschließen. Für den Betrieb ist der Bordcomputer per \acrshort{uart}-Verbindung angeschlossen.\newline
+
+Die Software des Flugcontrollers wird PX4-Flightstack genannt. Mit ihr lassen sich verschiedene Microcontroller, embedded Systems, oder PCs zum Steuern von Robotern, Fahrzeugen oder Drohnen ausgestatten. Sie wird von der Dronecode Stiftung\footnote{\url{https://www.dronecode.org/}} herausgegeben.
+
+\subsection{Bordcomputer}
+In der Ausarbeitung \cite{markusreinErweiterungBestehenderDrohnen2023} wurde ein \acrlong{rpi} Model 3 B+ an der Drohne montiert.
+
+Die Speicherkarte mit Betriebssystem und Software kann aus dem vorherigen Projekt übernommen werden. Installiert ist das 32-Bit Betriebssystem Raspberry Pi OS und das Programm \enquote{mavlink-routerd} mit dem \acrshort{mav}-Packete zwischen mehreren Schnittstellen weitergeleitet werden können. Letzteres startet automatisch beim Hochfahren des Systems und verbindet sich mit dem Flugcontroller (falls dieser eine Stromversorgung hat).
+
+Die Schnittstellen des \gls{rpi} sind folgendermaßen konfiguriert:
 \begin{itemize}
-    \item Erfassen von Ultraschall-Daten zum Detektieren von Hindernissen
-    \item Erfassen von Bildern
-    \item Verarbeiten von Bildern zur Detektieren von Hindernissen
-    \item Berechnung alternativer Flugbahn zur Umgehung von Hindernissen
+    \item \gls{uart} für Verbindung mit Flugcontroller
+    \item \gls{i2c} für Verbindung mit Arduino
+    \item \gls{wlan} eingerichtet als Hotspot
 \end{itemize}
 
-Die Umsetzung der Flugplanung soll mittels der Software \textit{Avoidance} erfolgen. Diese arbeitet auf dem Metabetriebssystem \acrshort{ros}, welches wiederum auf \textit{Ubuntu} aufsetzt. (Im Anwendungsfall ROS Noetic auf Ubuntu 20.04.) Die Software kann vollständig auf dem \gls{rpi} betrieben werden. Somit ergeben sich für den \gls{rpi} weitere Aufgabenbereiche, wie nachfolgend dargestellt. Das erweiterte System ist dargestellt in Bild \ref{fig:system_added_sensors}.
+\subsection{Bodenstation}
+Sie dient der Instrumentation der Drohne. 
 
+Als Bodenstation stehen verschiedene Programme sowohl für Computer als auch Smartphone zur Verfügung\cite{ardupilotdevteamChoosingGroundStation}:
 \begin{itemize}
-    \item Ubuntu 20.04 als Betriebssystem (nur indirekt möglich innerhalb eines Containers möglich)
-    \item \acrshort{ros}-Noetic innerhalb des Docker-Containers
-    \item Einlesen der Ultraschallsensordaten, erzeugen von Tiefenkarte und publizieren entsprechender Topic
-    \item Einlesen der Kamerabilder, erzeugen von Tiefenkarte und publizieren entsprechender Topic
-    \item Ausführung von Avoidance
+    \item Mission Planner
+    \item APM Planner 2.0
+    \item QGroundControl
+    \item DroidPlanner 3
+    \item AndroPilot
 \end{itemize}
+Im Projekt eingesetzt wird \textit{QGroundControl}, denn es ist das Programm der Dronecode Stiftung, verfügt also über die beste Unterstützung.\newline
 
-\subsection{Beschreibung der Simulation}\label{chap:intro_simulation}
-Die Entwicklung von Software für und im Zusammenhang mit dem Flugcontroller sieht vor, in einer Simulation getestet zu werden. Von der Dronecode-Stiftung wird als offizielle Umgebung dazu der Simulator \textit{Gazebo} empfohlen\cite{dronecodestiftungSimulationPX4User}. Sowohl die \textit{PX4}- als die \textit{Avoidance}-Software können vollständig in diesem betrieben werden. Zum Betrieb des Simulators wird wieder das Betriebssystem Linux Ubuntu benötigt. Deshalb werden für das Projekt einige Einschränkungen aufgenommen. Die weiteren Ausführungen hier beschreiben die Ausgangslage zur Simulation, in \cref{chap:intro_avoidance} wird \acrshort{ros} eingeführt und eingerichtet.
+QGroundControl baut automatisch eine Verbindung mit dem Flugcontroller auf, wenn dieser per Kabel mit dem Computer verunden ist, oder der Computer entsprechende UDP-Packete empfängt. Ersterer Modus kann genutzt werden, um die Firmware des Flugcontrollers zu aktualisieren.
 
-Zum Vorgehen wird der \gls{hil}-Aufbau mit dem Simulator \textit{AirSim} von Microsoft\cite{microsoftcorporationWelcomeAirSim2023}, wie in \cite[Kapitel 3.4.1]{markusreinErweiterungBestehenderDrohnen2023} beschrieben, verwendet. Bild \ref{fig:system_sim} zeigt, in Anlehnung an Bild \ref{fig:system_intro}, die durch die Simulation übernommenen Funktionen. Die Komponenten sind im Betrieb wie folgt verbunden:
-\begin{description}
-    \item[PC-Flugcontroller:] \acrshort{usb}-Kabel, wird von \textit{AirSim} zur direkten Kommunikation mit dem Flugcontroller verwendet
-    \item[PC-Bordcomputer:] \acrshort{wlan}, erlaubt Verbindung Bodenstation mit Flugcontroller
-\end{description}
+Weiterhin unterstützt QGroundControl die Verbindungsarten Netzwerk und Serielle Schnittstelle. Es könnte direkt auf dem Bordcomputer der Drohne betrieben werden. Weiterhin könnte es die Funktion von \textit{mavlink-routerd} übernehmen und somit Packete über das Netzwerk verteilen.
 
-Die Aufgaben der Komponenten während der Entwicklung sind:
-\begin{description}
-    \item[Simulation:] In der Simulation werden sowohl alle physikalischen Effekte berechnet als auch die virtuelle Umgebung der Drohne dargestellt. Die Sensordaten werden der Drohne direkt von der Simulation eingespeist. Eine resultierende Ansteuerung der Motoren wird in die Simulation übernommen. Somit kann sich die Drohne in der Simulation wie in realer Umgebung bewegen. Außerdem werden von der Drohne aufgenommene, simulierte Kamerabilder bereitgestellt.
-    \item[Drohne:] Der Flugcontroller auf der Drohne wird im \gls{hil}-Modus betrieben. Alle Ein- und Ausgänge zum Controller werden durch virtuelle Schnittstellen der Simulation ersetzt. Die Kommunikation mit dem Bordcomputer bleibt dieselbe wie zuvor, sodass die Drohne per Bodenstation gesteuert werden kann.
-    \item[Bordcomputer:] Wird weiterhin nur zur Kommunikation zwischen Bodenstation und Flugcontroller verwendet. Erweiterte Funktionen werden auf einem separaten Rechner entwickelt und getestet um anschließend auf den Bordcomputer überspielt zu werden.
-\end{description}
+\subsection{Ultraschallsensoren an der Drohne}
+Die Ultraschallsensoren erzeugen analoge Messwerte (Zeitdauer), die ausgewertet werden muss (siehe \cite[Kapitel 4.4]{markusreinErweiterungBestehenderDrohnen2023}). Diese Aufgabe übernimmt im Projekt ein Arduino Nano (Microcontroller).\newline
+
+Der Flugcontroller kann mit einer Reihe offiziell unterstützter Abstandssensoren arbeiten\footnote{siehe \url{https://docs.px4.io/main/en/sensor/rangefinders.html}}. Um einen eigenen Sensor zu entwerfen muss ein entsprechender Adapter an den Flugcontroller angeschlossen und das Protokoll \gls{mav} implementiert werden. Im Rahmen dieser Arbeit werden die digitalen Messwerte hingegen vom Bordcomputer abgefragt und verarbeitet.
+
+Dazu kommt das \gls{i2c}-Protokoll zum Einsatz. Der Arduino reagiert als Slave-Gerät mit der Adresse $8$. Nach der Adresse wird jeweils ein \enquote{Register} geschrieben, der Arduino antwortet mit den Werten der Sensoren. Mehr Details in \cref{chap:arduino_sensors}.
 
 %\paragraph*{}
 %Erweiterte Funktionalität wird auf dem Entwicklungsrechner in Containern, in Verbindung mit der Simulation, erprobt. Derartige fertige Anwendungen können dann direkt auf dem Bordcomputer eingesetzt werden. Bestandteile der Software sind:

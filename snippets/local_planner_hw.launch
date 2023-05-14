@@ -1,0 +1,34 @@
+<launch>
+    <arg name="ns" default="/"/>
+    <arg name="fcu_url" default="/dev/serial0:921600"/>
+    <arg name="gcs_url" default="tcp-l://" />
+    <arg name="tgt_system" default="1" />
+    <arg name="tgt_component" default="1" />
+    
+    <!-- Launch MavROS -->
+    <group ns="$(arg ns)">
+        <include file="$(find mavros)/launch/node.launch">
+            <arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+            <!-- Need to change the config file to get the tf topic and get local position in terms of local origin -->
+            <arg name="config_yaml" value="$(find avoidance)/resource/px4_config.yaml" />
+            <arg name="fcu_url" value="$(arg fcu_url)" />
+            <arg name="gcs_url" value="$(arg gcs_url)" />
+            <arg name="tgt_system" value="$(arg tgt_system)" />
+            <arg name="tgt_component" value="$(arg tgt_component)" />
+        </include>
+    </group>
+
+  <env name="ROSCONSOLE_CONFIG_FILE" value="$(find local_planner)/resource/custom_rosconsole.conf"/>
+  <arg name="pointcloud_topics" default="[/camera/depth/points]"/>
+
+  <node name="local_planner_node" pkg="local_planner" type="local_planner_node" output="screen" >
+    <param name="goal_x_param" value="10" />
+    <param name="goal_y_param" value="0"/>
+    <param name="goal_z_param" value="0" />
+    <rosparam param="pointcloud_topics" subst_value="True">$(arg pointcloud_topics)</rosparam>
+  </node>
+
+  <node name="pc_pub" pkg="ultrasensor" type="sensor_interface.py" output="screen">
+  </node>
+
+</launch>

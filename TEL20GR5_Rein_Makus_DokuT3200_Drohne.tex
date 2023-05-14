@@ -31,12 +31,12 @@
 \placeOfBirth{Leipzig}
 \address{Alexanderstraße 146, 70180 Stuttgart}
 \major{Elektrotechnik}
-\title{Erweiterung bestehender Drohnen um eine Autonomflugfähigkeit}
-\titleTranslated{Wie man einen Hamster trainiert}
+\title{Erweiterung bestehender Drohnen um eine Autonomflugfähigkeit II}
+% \titleTranslated{Wie man einen Hamster trainiert}
 \matrnr{6983030, TEL20GR5}
-\date{21.10.22 -- 22.01.2023}
+\date{23.01.2023 -- 14.05.2023}
 \supervisor{Prof. Dr.-Ing. Johannes Moosheimer}
-\professor{Prof. Dr.-Ing. Oliver Riedel}
+% \professor{Prof. Dr.-Ing. Oliver Riedel}
 \usepackage{atbegshi}% http://ctan.org/pkg/atbegshi
 \AtBeginDocument{\AtBeginShipoutNext{\AtBeginShipoutDiscard}} 
     
@@ -49,7 +49,24 @@
     \declarationOfOriginality
 
     % Kurzfassung/Abstract
-    
+\chapter*{Abstrakt}
+In dieser Arbeit wird eine Modellbaudrohne mit Sensoren erweitert um einen autonomen Flug durchzuführen.
+
+Tiefgehende Versuche werden durchgeführt um die Fähigkeiten der Drohne zu beurteilen. Das ursprüngliche System verfügt bereits über ausgiebige Funktionen die einem autonomen Flug sehr nahe kommen.
+
+Die Drohne wird mit einem zusätzlichen Computer ausgestattet, der es erlaubt selbige per Netzwerkzugriff zu steuern. Gleichzeitig kann dieser zusätzliche Sensoren auslesen und Auswerten. Ultraschallsensoren und Kameras sollen zum Erkennen von Hindernissen zum Einsatz kommen. Eine Software zur Planung von Flugbahnen mit Wegkorrektur beim Erscheinen von Hindernissen wird getestet und auf das Projekt angepasst. Die Auswertung der Software erfolgt auf der Drohne selbst, sodass diese ohne weiteres Zutun ihren Weg anpassen kann.
+
+Im Projekt wird das Einlesen der Ultraschallsensoren ausgiebig entwickelt. Die Verwendung von Kameras ist vorgesehen um eine Tiefenkarte der Umgebung zu erzeugen, scheitert jedoch an der Anbindung an eine vorgesehene Hardware. Jedoch kann die Drohne allein mit den Ultraschallsensoren um einfache Hindernisse herum navigieren. 
+
+\chapter*{Abstract}
+In this thesis a model construction drone is equipped with additional sensors to perform an autonomous flight.
+
+Far-reaching tests were conducted to assess the capabilities of the drone. The original system already implements extensive functionality which comes close to autonomous flight.
+
+During the project the drone is extended by an additional computer which allows to control the drone per network interface. At the same time this computer can interface additional sensors and process data. Ultrasonic sensors and cameras shall be used for detection of obstacles. A software to adopt a trajectory based on occuring obstacles is tested and tailored to the project. All processing is performed on-board the drone so that it can fly without manuel interventions.
+
+The project documents development for interfacing ultrasonic sensors. The usage of cameras is intended to generate a depth-map of the surroundings, though failed due to connectivity of the cameras. But still the drone is able to fly solely using ultrasonic sensors to navigate around small obstacles.
+
     \cleardoublepage
     \tableofcontents
 

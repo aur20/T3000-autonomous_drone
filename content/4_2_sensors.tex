@@ -40,7 +40,7 @@ zu verarbeiten, aber dies wird auch für das Projekt nicht benötigt. Mit dem ve
 Der entstandene Aufwand steht in keinem Verhältnis zum Gewinn, in der finalen Anwendung können Standardpackete verwendet werden.
 
 \section{Beschaffung Hardware Stereokamera}
-Der \gls{rpi} 4 hätte hardware-technische Unterstützung mehrere Kameras anzuschließen. Allerdings besitzen die Modelle A und B nur immer einen notwendigen Header.
+Der \gls{rpi} 4 hätte hardware-technische Unterstützung mehrere Kameras anzuschließen. Allerdings besitzen die Modelle A und B nur immer einen notwendigen Header um ein Kameramodul anzuschließen.
 
 Alternative Boards wurden von folgenden Projekten entwickelt:
 \begin{itemize}
@@ -48,7 +48,7 @@ Alternative Boards wurden von folgenden Projekten entwickelt:
     \item Arducam\footnote{\url{https://www.arducam.com/product-category/stereo-vision-cameras/}}
 \end{itemize}
 
-Entscheidender Faktor bei der Beschaffung im Rahmen dieses Projektes ist der Preis, weshalb ein Stereopi gewählt wurde. Zusätzlich wird in jedem Fall ein leistungsstarker \gls{rpi} benötigt. Der aktuelle \textit{Stereopi v2} benötigt ein \textit{\gls{cm4}}, eine kleine Platine die als Aufsatz gedacht ist. Beide Gerät sind in \ref{fig:stereopi_intro} abgebildet.
+Entscheidender Faktor bei der Beschaffung im Rahmen dieses Projektes ist der Preis, weshalb ein Stereopi gewählt wurde. Zusätzlich wird in jedem Fall ein leistungsstarker \gls{rpi} benötigt. Der aktuelle \textit{Stereopi v2} benötigt ein \textit{\gls{cm4}}, eine verkleinerte Version des \gls{rpi}, die als Aufsatz gedacht ist und selbst keine Anschlüsse besitzt. Beide Gerät sind in \ref{fig:stereopi_intro} abgebildet.
 
 \begin{figure}[!ht]
     \centering
@@ -99,8 +99,8 @@ Das \acrshort{ros}-Punktwolkenformat definiert eine Klasse mit den Eigenschaften
     \item[Header:]
     \begin{itemize}
         \item[]
-        \item stamp - aktueller Zeitstempel
-        \item frame\_id - Kennzeichnung zur Transformation
+        \item[$\cdot$] stamp - aktueller Zeitstempel
+        \item[$\cdot$] frame\_id - Kennzeichnung zur Transformation
     \end{itemize}
     \item[Fields:] Liste von Eigenschaften der Punkte, beihaltet x-,y-,z-Position sowie Farbattribute
     \item[Points:] Liste von Punkten, jeder Punkt im Format wie \enquote{Fields}
@@ -117,7 +117,7 @@ Zur Erprobung wird eine Liste von Punkten angelegt. Diese befinden sich in 4 Eck
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.7\linewidth]{images/ultra_pc_test.png}
-    \caption[Erprobung von Punktwolkenformat]{Erprobung von Punktwolkenformat in \textit{rviz}: die Punkte jeweils im Abstand von $1m$ zum Ursprung. Als Referenz wurde noch ein Koordinatensystem am Ursprung eingezeichnet, bei diesem enspricht x-Achse=rot, y-Achse=grün, z-Achse=blau.}
+    \caption[Erprobung von Punktwolkenformat]{Erprobung von Punktwolkenformat in \textit{rviz}: die Punkte jeweils im Abstand von $1m$ zum Ursprung. Als Referenz wurde noch ein Koordinatensystem am Ursprung eingezeichnet, bei diesem enspricht rot der x-Achse=rot, grün der y-Achse, blau der z-Achse}
     \label{fig:ultra_pc_test}
 \end{figure}
 
@@ -126,11 +126,11 @@ Zur weiteren Erprobung wird die Simulation gestartet. Die 5 erzeugten Punkte sol
 \begin{figure}[!h]
     \centering
     \includegraphics[width=0.7\linewidth]{images/ultra_pc_test_sim.png}
-    \caption[Erprobung von Punktwolkenformat mit Simulator]{Erprobung von Punktwolkenformat mit Simulator: die Drohne befindet sich in der Luft vor den Bäumen, um sie herum sind die erzeugten Punkte eingezeichnet.}
+    \caption[Erprobung von Punktwolkenformat mit Simulator]{Erprobung von Punktwolkenformat mit Simulator: die Drohne befindet sich in der Luft vor den Bäumen, um sie herum sind die erzeugten Punkte eingezeichnet}
     \label{fig:ultra_pc_test_sim}
 \end{figure}
 
-\subsection{Software der Sensoren}
+\subsection{Software der Sensoren}\label{chap:arduino_sensors}
 Der Algorithmus zum Auslesen der Sensoren wurde bereits für \cite[Kapitel 4.4]{markusreinErweiterungBestehenderDrohnen2023} entworfen, aber die Anwendung noch nicht dokumentiert. Der Code des Projektteils ist auf GitHub unter \footnote{\url{https://github.com/aur20/T3000-autonomous_drone/tree/arduino_sensors}} hinterlegt. Er besteht aus 2 Teilen:
 
 Die \textbf{\large Arduino Firmware} liest die Sensoren aus und stellt Daten per \gls{i2c} zur Verfügung.
@@ -173,8 +173,3 @@ Als nächster Schritt wurden die vorliegenden Programme miteinander vereinigt.
 Vom letzten Script werden jeweils alle 4 Sensoren ausgelesen. Aufgrund der Ungenauigkeit der Messwerte, wurde der Wertebereich nochmals eingeschränkt und beträgt hier $3m$. Größere Werte (beinhaltet Werte außerhalb der Reichweite, die mit $4m$ gesendet werden) werden schlichtweg ignoriert. Die Angaben für die Punktwolke werden auf Meter umgerechnet.
 
 Das Projekt liegt separat auf GitHub\footnote{\url{https://github.com/aur20/T3000-autonomous_drone/tree/rpi_ros_ultrasonic}} und kann innerhalb zukünftiger Container direkt eingebunden werden.
-
-\subsection{Verbesserung der Aufnahmegenauigkeit der Sensoren}
-Um die Aufnahmegenauigkeit der Sensoren zu verbessern, könnte eine Interrupt gesteuerte Auslösung des Messvorgangs zum Einsatz kommen. Ein Timer könnte nach jeweils $60ms$ auslösen um die Messung und Berechnungen des Filters durchzuführen.
-% Der notwendige Code ist gezeigt in , wurde aber nicht mit der realen Drohne getestet.
-
